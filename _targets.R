@@ -30,6 +30,14 @@ list(
         "2021-07-31"
     ),
     tar_target(
+        tools_sha,
+        get_path_sha("database/tools.tsv", date = date)
+    ),
+    tar_target(
+        tools,
+        load_tools_sha(tools_sha)
+    ),
+    tar_target(
         categories_idx_sha,
         get_path_sha("database/categories-idx.tsv", date = date)
     ),
