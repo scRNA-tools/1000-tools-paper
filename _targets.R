@@ -11,6 +11,7 @@ library(here)
 
 source(here("R", "github.R"))
 source(here("R", "load.R"))
+source(here("R", "references.R"))
 
 #==============================================================================#
 # ---- OPTIONS ----
@@ -44,6 +45,14 @@ list(
     tar_target(
         categories_idx,
         load_categories_idx_sha(categories_idx_sha)
+    ),
+    tar_target(
+        references_sha,
+        get_path_sha("database/references.tsv", date = date)
+    ),
+    tar_target(
+        references,
+        load_references_sha(references_sha)
     ),
     tar_target(
         categories_mat,

@@ -56,6 +56,25 @@ load_categories_idx <- function(file) {
     )
 }
 
+#' Load references
+#'
+#' @param file Path to references TSV file, passed to `readr::read_tsv()`
+#'
+#' @return tibble containing references
+load_references <- function(file) {
+    readr::read_tsv(
+        file,
+        col_types = readr::cols(
+            DOI      = readr::col_character(),
+            arXiv    = readr::col_logical(),
+            Preprint = readr::col_logical(),
+            Date     = readr::col_character(),
+            Title    = readr::col_character()
+        )
+    ) %>%
+        update_references()
+}
+
 #' Load tools from SHA
 #'
 #' Load the tools table from GitHub corresponding to a specific commit
@@ -86,6 +105,23 @@ load_categories_idx_sha <- function(sha) {
             "https://github.com/scRNA-tools/scRNA-tools/raw/",
             sha,
             "/database/categories-idx.tsv"
+        )
+    )
+}
+
+#' Load references from SHA
+#'
+#' Load the references table from GitHub corresponding to a specific commit
+#'
+#' @param sha SHA hash corresponding to a git commit
+#'
+#' @return tibble containing references
+load_references_sha <- function(sha) {
+    load_references(
+        glue::glue(
+            "https://github.com/scRNA-tools/scRNA-tools/raw/",
+            sha,
+            "/database/references.tsv"
         )
     )
 }
