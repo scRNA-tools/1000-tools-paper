@@ -1,23 +1,59 @@
+#==============================================================================#
+# ---- LIBRARIES ----
+#==============================================================================#
+
 library(targets)
-# This is an example _targets.R file. Every
-# {targets} pipeline needs one.
-# Use tar_script() to create _targets.R and tar_edit()
-# to open it again for editing.
-# Then, run tar_make() to run the pipeline
-# and tar_read(summary) to view the results.
 
-# Define custom functions and other global objects.
-# This is where you write source(\"R/functions.R\")
-# if you keep your functions in external scripts.
-summ <- function(dataset) {
-  summarize(dataset, mean_x = mean(x))
-}
+#==============================================================================#
+# ---- FUNCTIONS ----
+#==============================================================================#
 
-# Set target-specific options such as packages.
-tar_option_set(packages = "dplyr")
+#==============================================================================#
+# ---- OPTIONS ----
+#==============================================================================#
 
-# End this file with a list of target objects.
+tar_option_set(
+    packages = "magrittr"
+)
+
+#==============================================================================#
+# ---- PIPELINE ----
+#==============================================================================#
+
 list(
-  tar_target(data, data.frame(x = sample.int(100), y = sample.int(100))),
-  tar_target(summary, summ(data)) # Call your custom functions as needed.
+    tar_target(
+        date,
+        "2021-07-31"
+    ),
+    tar_target(
+        categories_idx_sha,
+        gh::gh(paste0(
+            "GET /repos/scRNA-tools/scRNA-tools/commits?until=",
+            date,
+            "&path=/database/categories-idx.tsv"
+        ))[[1]]$sha
+    ),
+    tar_target(
+        categories_idx,
+        readr::read_tsv(
+            paste0(
+                "https://github.com/scRNA-tools/scRNA-tools/raw/",
+                categories_idx_sha,
+                "/database/categories-idx.tsv"
+            ),
+            col_types = readr::cols(
+                Tool     = readr::col_character(),
+                Category = readr::col_character()
+            )
+        )
+    ),
+    tar_target(
+        categories_mat,
+        categories_idx %>%
+            dplyr::mutate(Present = 1) %>%
+            tidyr::complete(Tool, Category, fill = list(Present = 0)) %>%
+            tidyr::pivot_wider(names_from = Category, values_from = Present) %>%
+            tibble::column_to_rownames("Tool") %>%
+            as.matrix()
+    )
 )
