@@ -32,7 +32,8 @@ list(
     ),
     tar_target(
         tools_sha,
-        get_path_sha("database/tools.tsv", date = date)
+        get_path_sha("database/tools.tsv", date = date),
+        cue = tar_cue("always")
     ),
     tar_target(
         tools,
@@ -40,7 +41,8 @@ list(
     ),
     tar_target(
         categories_idx_sha,
-        get_path_sha("database/categories-idx.tsv", date = date)
+        get_path_sha("database/categories-idx.tsv", date = date),
+        cue = tar_cue("always")
     ),
     tar_target(
         categories_idx,
@@ -48,7 +50,8 @@ list(
     ),
     tar_target(
         references_sha,
-        get_path_sha("database/references.tsv", date = date)
+        get_path_sha("database/references.tsv", date = date),
+        cue = tar_cue("always")
     ),
     tar_target(
         references,
