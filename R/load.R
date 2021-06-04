@@ -52,6 +52,26 @@ load_references <- function(file) {
         update_references()
 }
 
+#' Load repositories
+#'
+#' @param file Path to repositories TSV file, passed to `readr::read_tsv()`
+#'
+#' @return tibble containing repositories
+load_repositories <- function(file) {
+    readr::read_tsv(
+        file,
+        col_types = readr::cols(
+            Tool   = readr::col_character(),
+            Bioc   = readr::col_character(),
+            CRAN   = readr::col_character(),
+            PyPI   = readr::col_character(),
+            Conda  = readr::col_logical(),
+            GitHub = readr::col_character()
+        )
+    ) %>%
+        dplyr::select(-Conda)
+}
+
 #' Load tools from SHA
 #'
 #' Load the tools table from GitHub corresponding to a specific commit
@@ -99,6 +119,23 @@ load_references_sha <- function(sha) {
             "https://github.com/scRNA-tools/scRNA-tools/raw/",
             sha,
             "/database/references.tsv"
+        )
+    )
+}
+
+#' Load repositories from SHA
+#'
+#' Load the repositories table from GitHub corresponding to a specific commit
+#'
+#' @param sha SHA hash corresponding to a git commit
+#'
+#' @return tibble containing repositories
+load_repositories_sha <- function(sha) {
+    load_repositories(
+        glue::glue(
+            "https://github.com/scRNA-tools/scRNA-tools/raw/",
+            sha,
+            "/database/repositories.tsv"
         )
     )
 }

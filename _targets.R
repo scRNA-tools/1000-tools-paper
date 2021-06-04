@@ -63,6 +63,15 @@ list(
         load_references_sha(references_sha)
     ),
     tar_target(
+        repositories_sha,
+        get_path_sha("database/repositories.tsv", date = date),
+        cue = tar_cue("always")
+    ),
+    tar_target(
+        repositories,
+        load_repositories_sha(repositories_sha)
+    ),
+    tar_target(
         categories_mat,
         categories_idx %>%
             dplyr::mutate(Present = 1) %>%
