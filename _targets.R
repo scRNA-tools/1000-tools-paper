@@ -11,6 +11,7 @@ library(here)
 
 source(here("R", "github.R"))
 source(here("R", "load.R"))
+source(here("R", "tools.R"))
 source(here("R", "references.R"))
 
 #==============================================================================#
@@ -36,8 +37,12 @@ list(
         cue = tar_cue("always")
     ),
     tar_target(
-        tools,
+        tools_raw,
         load_tools_sha(tools_sha)
+    ),
+    tar_target(
+        tools,
+        augment_tools(tools_raw)
     ),
     tar_target(
         categories_idx_sha,
