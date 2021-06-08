@@ -3,13 +3,16 @@
 #' Add additional information to a tools dataset
 #'
 #' @param tools data.frame containing tools data
+#' @param references data.frame containing references data
+#' @param doi_idx data.frame containing DOI index
 #'
 #' @return tools tibble with additional information
-augment_tools <- function(tools) {
+augment_tools <- function(tools, references, doi_idx) {
     tools %>%
         expand_platforms() %>%
         expand_licenses() %>%
-        add_timestamp_days()
+        add_timestamp_days() %>%
+        add_references(references, doi_idx)
 }
 
 #' Expand platforms
@@ -67,4 +70,29 @@ add_timestamp_days <- function(tools) {
             AddedDays   = as.numeric(Added - min(Added)),
             UpdatedDays = as.numeric(Updated - min(Added))
         )
+}
+
+#' Add references
+#'
+#' Add a summary of references to the tools data
+#'
+#' @param tools data.frame containing tools data
+#' @param references data.frame containing references data
+#' @param doi_idx data.frame containing DOI index
+#'
+#' @return tools tibble with references summary
+add_references <- function(tools, references, doi_idx) {
+
+    references_summ <- doi_idx %>%
+        dplyr::left_join(references, by = "DOI") %>%
+        dplyr::group_by(Tool) %>%
+        dplyr::summarise(
+            Publications        = sum(!Preprint),
+            Preprints           = sum(Preprint),
+            TotalCitations      = sum(Citations, na.rm = TRUE),
+            MeanCitationsPerDay = mean(CitationsPerDay, na.rm = TRUE)
+        )
+
+    tools %>%
+        dplyr::left_join(references_summ, by = "Tool")
 }

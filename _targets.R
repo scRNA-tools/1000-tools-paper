@@ -41,10 +41,6 @@ list(
         load_tools_sha(tools_sha)
     ),
     tar_target(
-        tools,
-        augment_tools(tools_raw)
-    ),
-    tar_target(
         categories_idx_sha,
         get_path_sha("database/categories-idx.tsv", date = date),
         cue = tar_cue("always")
@@ -83,6 +79,10 @@ list(
     tar_target(
         gh_repos,
         load_github_repositories(repositories)
+    ),
+    tar_target(
+        tools,
+        augment_tools(tools_raw, references, doi_idx)
     ),
     tar_target(
         categories_mat,
