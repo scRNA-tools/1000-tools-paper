@@ -52,6 +52,21 @@ load_references <- function(file) {
         update_references()
 }
 
+#' Load DOI index
+#'
+#' @param file Path to DOI index TSV file, passed to `readr::read_tsv()`
+#'
+#' @return tibble containing DOI index
+load_doi_idx <- function(file) {
+    readr::read_tsv(
+        file,
+        col_types = readr::cols(
+            Tool = readr::col_character(),
+            DOI  = readr::col_character()
+        )
+    )
+}
+
 #' Load repositories
 #'
 #' @param file Path to repositories TSV file, passed to `readr::read_tsv()`
@@ -147,6 +162,23 @@ load_references_sha <- function(sha) {
             "https://github.com/scRNA-tools/scRNA-tools/raw/",
             sha,
             "/database/references.tsv"
+        )
+    )
+}
+
+#' Load DOI index from SHA
+#'
+#' Load the DOI index from GitHub corresponding to a specific commit
+#'
+#' @param sha SHA hash corresponding to a git commit
+#'
+#' @return tibble containing DOI index
+load_doi_idx_sha <- function(sha) {
+    load_doi_idx(
+        glue::glue(
+            "https://github.com/scRNA-tools/scRNA-tools/raw/",
+            sha,
+            "/database/doi-idx.tsv"
         )
     )
 }

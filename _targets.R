@@ -68,6 +68,15 @@ list(
         cue = tar_cue("always")
     ),
     tar_target(
+        doi_idx_sha,
+        get_path_sha("database/doi-idx.tsv", date = date),
+        cue = tar_cue("always")
+    ),
+    tar_target(
+        doi_idx,
+        load_doi_idx_sha(doi_idx_sha)
+    ),
+    tar_target(
         repositories,
         load_repositories_sha(repositories_sha)
     ),
