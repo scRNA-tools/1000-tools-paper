@@ -5,14 +5,17 @@
 #' @param tools data.frame containing tools data
 #' @param references data.frame containing references data
 #' @param doi_idx data.frame containing DOI index
+#' @param repositories data.frame containing repositories data
+#' @param gh_repos data.frame containing GitHub repositories data
 #'
 #' @return tools tibble with additional information
-augment_tools <- function(tools, references, doi_idx) {
+augment_tools <- function(tools, references, doi_idx, repositories, gh_repos) {
     tools %>%
         expand_platforms() %>%
         expand_licenses() %>%
         add_timestamp_days() %>%
-        add_references(references, doi_idx)
+        add_references(references, doi_idx) %>%
+        add_repositories(repositories, gh_repos)
 }
 
 #' Expand platforms
@@ -102,4 +105,28 @@ add_references <- function(tools, references, doi_idx) {
 
     tools %>%
         dplyr::left_join(references_summ, by = "Tool")
+}
+
+#' Add repositories
+#'
+#' Add repositories and GitHub stats to the tools data
+#'
+#' @param tools data.frame containing tools data
+#' @param repositories data.frame containing repositories data
+#' @param gh_repos data.frame containing GitHub repositories data
+#'
+#' @return tools tibble with repositories information
+add_repositories <- function(tools, repositories, gh_repos) {
+
+    colnames(gh_repos) <- paste0("GH", colnames(gh_repos))
+
+    tools %>%
+        dplyr::left_join(repositories, by = "Tool") %>%
+        dplyr::left_join(gh_repos, by = c(GitHub = "GHRepo")) %>%
+        dplyr::mutate(
+            Bioc   = !is.na(Bioc),
+            CRAN   = !is.na(CRAN),
+            PyPI   = !is.na(PyPI),
+            GitHub = !is.na(GitHub)
+        )
 }

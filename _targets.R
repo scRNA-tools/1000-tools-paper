@@ -82,7 +82,7 @@ list(
     ),
     tar_target(
         tools,
-        augment_tools(tools_raw, references, doi_idx)
+        augment_tools(tools_raw, references, doi_idx, repositories, gh_repos)
     ),
     tar_target(
         categories_mat,
