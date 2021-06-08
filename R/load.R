@@ -99,7 +99,8 @@ load_github_repositories <- function(repositories) {
 
     repos <- repositories %>%
         dplyr::filter(!is.na(GitHub)) %>%
-        dplyr::pull(GitHub)
+        dplyr::pull(GitHub) %>%
+        unique()
 
     get_repo_info_slowly <- purrr::slowly(
         get_repo_info,
