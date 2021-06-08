@@ -72,6 +72,10 @@ list(
         load_repositories_sha(repositories_sha)
     ),
     tar_target(
+        gh_repos,
+        load_github_repositories(repositories)
+    ),
+    tar_target(
         categories_mat,
         categories_idx %>%
             dplyr::mutate(Present = 1) %>%

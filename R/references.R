@@ -8,18 +8,8 @@
 #' @return tibble with updated references
 update_references <- function(references) {
 
-    pb <- progress::progress_bar$new(
-        format = paste(
-            "[:bar] :current/:total :percent",
-            "Elapsed: :elapsedfull ETA: :eta"
-        ),
-        total = nrow(references),
-        clear = FALSE
-    )
-    pb$tick(0)
-
     works <- purrr::map_dfr(references$DOI[!references$arXiv], function(.doi) {
-        pb$tick()
+        message("Getting DOI ", .doi, "...")
         rcrossref::cr_works(dois = .doi)$data
     })
 

@@ -72,6 +72,34 @@ load_repositories <- function(file) {
         dplyr::select(-Conda)
 }
 
+#' Load GitHub repositories
+#'
+#' @param repositories data.frame of tool repositories
+#'
+#' @return tibble containing GitHub repositories
+load_github_repositories <- function(repositories) {
+
+    # Clear missing repos log file
+    fs::file_delete(fs::path(here::here("_cache"), "missing_repos.tsv"))
+
+    repos <- repositories %>%
+        dplyr::filter(!is.na(GitHub)) %>%
+        dplyr::pull(GitHub)
+
+    get_repo_info_slowly <- purrr::slowly(
+        get_repo_info,
+        rate = purrr::rate_delay(1)
+    )
+
+    purrr::map_dfr(repos, get_repo_info_slowly) %>%
+        dplyr::mutate(
+            # Add 1 to avoid negative scores
+            IssueActivity = log10((ClosedIssues / AgeYears) + 1),
+            IssueResponse = max(MedianResponseDays, na.rm = TRUE) -
+                MedianResponseDays
+        )
+}
+
 #' Load tools from SHA
 #'
 #' Load the tools table from GitHub corresponding to a specific commit
