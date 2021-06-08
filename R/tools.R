@@ -49,6 +49,13 @@ expand_licenses <- function(tools) {
             LicenseArtistic = stringr::str_detect(.data$License, "Artistic")
         ) %>%
         dplyr::mutate(
+            LicenseGPL      = tidyr::replace_na(.data$LicenseGPL, FALSE),
+            LicenseMIT      = tidyr::replace_na(.data$LicenseMIT, FALSE),
+            LicenseBSD      = tidyr::replace_na(.data$LicenseBSD, FALSE),
+            LicenseApache   = tidyr::replace_na(.data$LicenseApache, FALSE),
+            LicenseArtistic = tidyr::replace_na(.data$LicenseArtistic, FALSE)
+        ) %>%
+        dplyr::mutate(
             LicenseOther = !is.na(License) & !(
                 LicenseGPL | LicenseMIT | LicenseBSD | LicenseApache |
                     LicenseArtistic
