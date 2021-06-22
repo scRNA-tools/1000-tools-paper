@@ -151,5 +151,9 @@ list(
     tar_target(
         landscape_umap,
         plot_landscape_umap(mfa_data, hcpc, umap)
+    ),
+    tar_target(
+        tools_plot,
+        plot_tools_over_time(tools)
     )
 )
