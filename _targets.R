@@ -14,6 +14,8 @@ source(here("R", "load.R"))
 source(here("R", "tools.R"))
 source(here("R", "references.R"))
 source(here("R", "sankey.R"))
+source(here("R", "mfa.R"))
+source(here("R", "plotting.R"))
 
 #==============================================================================#
 # ---- OPTIONS ----
@@ -51,6 +53,15 @@ list(
         load_categories_idx_sha(categories_idx_sha)
     ),
     tar_target(
+        categories,
+        categories_idx %>%
+            dplyr::mutate(Present = TRUE) %>%
+            tidyr::complete(Tool, Category, fill = list(Present = FALSE)) %>%
+            tidyr::pivot_wider(names_from = Category, values_from = Present) %>%
+            setNames(paste0("Cat", names(.))) %>%
+            dplyr::rename(Tool = CatTool)
+    ),
+    tar_target(
         references_sha,
         get_path_sha("database/references.tsv", date = date),
         cue = tar_cue("always")
@@ -86,15 +97,6 @@ list(
         augment_tools(tools_raw, references, doi_idx, repositories, gh_repos)
     ),
     tar_target(
-        categories_mat,
-        categories_idx %>%
-            dplyr::mutate(Present = 1) %>%
-            tidyr::complete(Tool, Category, fill = list(Present = 0)) %>%
-            tidyr::pivot_wider(names_from = Category, values_from = Present) %>%
-            tibble::column_to_rownames("Tool") %>%
-            as.matrix()
-    ),
-    tar_target(
         sankey,
         plot_sankey(
             data   = get_sankey_data(tools),
@@ -103,5 +105,51 @@ list(
             width  = 0.2,
             space  = 0.05
         )
+    ),
+    tar_target(
+        mfa_variables,
+        get_mfa_variables()
+    ),
+    tar_target(
+        mfa_data,
+        tools %>%
+            dplyr::left_join(categories, by = "Tool") %>%
+            dplyr::select(
+                Tool,
+                dplyr::any_of(
+                    unlist(
+                        purrr::map(mfa_variables, ~ .x$variables),
+                        use.names = FALSE
+                    )
+                )
+            ) %>%
+            dplyr::mutate(
+                dplyr::across(
+                    tidyselect:::where(is.logical),
+                    as.factor
+                )
+            ) %>%
+            tibble::column_to_rownames("Tool")
+    ),
+    tar_target(
+        mfa,
+        run_mfa(mfa_data, mfa_variables)
+    ),
+    tar_target(
+        hcpc,
+        FactoMineR::HCPC(
+            mfa,
+            nb.clust = 8,
+            consol   = TRUE,
+            graph    = FALSE
+        )
+    ),
+    tar_target(
+        umap,
+        uwot::umap(mfa$ind$coord, min_dist = 1)
+    ),
+    tar_target(
+        landscape_umap,
+        plot_landscape_umap(mfa_data, hcpc, umap)
     )
 )
