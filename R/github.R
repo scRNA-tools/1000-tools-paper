@@ -41,20 +41,20 @@ get_repo_info <- function(repo) {
 
         return(
             tibble::tibble(
-                Repo              = character(),
-                Owner             = character(),
-                Name              = character(),
-                Created           = lubridate::ymd_hms(),
-                Stars             = integer(),
-                Forks             = integer(),
-                AgeYears          = numeric(),
-                Contributors      = integer(),
-                Commits           = numeric(),
-                Issues            = integer(),
-                ClosedIssues      = integer(),
-                PctIssuesClosed   = numeric(),
-                MedianReponseDays = numeric(),
-                MedianClosedDays  = numeric()
+                Repo               = character(),
+                Owner              = character(),
+                Name               = character(),
+                Created            = lubridate::ymd_hms(),
+                Stars              = integer(),
+                Forks              = integer(),
+                AgeYears           = numeric(),
+                Contributors       = integer(),
+                Commits            = numeric(),
+                Issues             = integer(),
+                ClosedIssues       = integer(),
+                PctIssuesClosed    = numeric(),
+                MedianResponseDays = numeric(),
+                MedianClosedDays   = numeric()
             )
         )
     }

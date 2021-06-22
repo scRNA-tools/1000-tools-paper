@@ -13,6 +13,7 @@ source(here("R", "github.R"))
 source(here("R", "load.R"))
 source(here("R", "tools.R"))
 source(here("R", "references.R"))
+source(here("R", "sankey.R"))
 
 #==============================================================================#
 # ---- OPTIONS ----
@@ -92,5 +93,15 @@ list(
             tidyr::pivot_wider(names_from = Category, values_from = Present) %>%
             tibble::column_to_rownames("Tool") %>%
             as.matrix()
+    ),
+    tar_target(
+        sankey,
+        plot_sankey(
+            data   = get_sankey_data(tools),
+            value  = "Count",
+            colour = "Platform",
+            width  = 0.2,
+            space  = 0.05
+        )
     )
 )
