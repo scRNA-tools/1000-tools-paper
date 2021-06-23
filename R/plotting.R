@@ -204,3 +204,52 @@ plot_publication_status <- function(tools) {
             panel.grid = ggplot2::element_blank()
         )
 }
+
+#' Plot GitHub stats
+#'
+#' Create a text plot of some GitHub summary statistics
+#'
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot object
+plot_gh_stats <- function(tools) {
+
+    stats <- tibble::tribble(
+                ~ Stat,                                      ~ Value,
+               "Repos",                    sum(!is.na(tools$GitHub)),
+              "Owners",                length(unique(tools$GHOwner)),
+        "Contributors",      sum(tools$GHContributors, na.rm = TRUE),
+             "Commits",           sum(tools$GHCommits, na.rm = TRUE),
+               "Hours", sum(tools$GHCommits, na.rm = TRUE) * 10 / 60
+    ) %>%
+        dplyr::mutate(Stat = factor(Stat, levels = Stat)) %>%
+        dplyr::mutate(
+            ValueLabel = dplyr::if_else(
+                Stat == "Hours",
+                paste0("~", signif(Value, 2)),
+                as.character(Value)
+            )
+        )
+
+    ggplot2::ggplot(stats, ggplot2::aes(x = "A", y = forcats::fct_rev(Stat))) +
+        ggplot2::geom_text(
+            ggplot2::aes(label = ValueLabel),
+            size    = 20,
+            colour  = "dodgerblue",
+            hjust   = 1,
+            nudge_x = -0.01
+        ) +
+        ggplot2::geom_text(
+            ggplot2::aes(label = Stat),
+            size    = 20,
+            colour  = "black",
+            hjust   = 0,
+            nudge_x = 0.01
+        ) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.title = ggplot2::element_blank(),
+            axis.text  = ggplot2::element_blank(),
+            panel.grid = ggplot2::element_blank()
+        )
+}

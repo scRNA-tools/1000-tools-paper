@@ -163,5 +163,9 @@ list(
     tar_target(
         pub_status_plot,
         plot_publication_status(tools)
+    ),
+    tar_target(
+        gh_stats_plot,
+        plot_gh_stats(tools)
     )
 )
