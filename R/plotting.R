@@ -82,7 +82,7 @@ get_date_totals <- function(tools) {
 #' Create a raincloud plot showing the number of days between the first preprint
 #' for a tool and the first publication
 #'
-#' @param doi_idx data.frame containg DOI index
+#' @param doi_idx data.frame containing DOI index
 #' @param references data.frame containing references data
 #'
 #' @return ggplot object
@@ -147,5 +147,60 @@ plot_publication_delay <- function(doi_idx, references) {
             panel.grid.minor.x = ggplot2::element_blank(),
             panel.grid.major.y = ggplot2::element_blank(),
             panel.grid.minor.y = ggplot2::element_blank()
+        )
+}
+
+#' Plot publication status
+#'
+#' Create a bar plot of the current publication status
+#'
+#' @param tools data.frame containing tools information
+#'
+#' @return ggplot2 object
+plot_publication_status <- function(tools) {
+    plot_data <- tools %>%
+        dplyr::mutate(
+            IsPublished = Publications > 0,
+            IsPreprint  = Preprints > 0
+        ) %>%
+        dplyr::mutate(
+            PubStatus = dplyr::case_when(
+                IsPublished ~ "Published",
+                IsPreprint  ~ "Preprint",
+                TRUE        ~ "Unpublished"
+            )
+        ) %>%
+        dplyr::mutate(
+            PubStatus = factor(
+                PubStatus,
+                levels = c("Published", "Preprint", "Unpublished")
+            )
+        ) %>%
+        dplyr::group_by(PubStatus) %>%
+        dplyr::summarise(Count = dplyr::n()) %>%
+        dplyr::mutate(Prop = Count / sum(Count)) %>%
+        dplyr::mutate(
+            PctStr = format(
+                Prop * 100,
+                digits = 1,
+                nsmall = 1
+            ),
+            Label = glue::glue("{PubStatus}\n({Count}, {PctStr}%)")
+        )
+
+    ggplot2::ggplot(plot_data, ggplot2::aes(x = PubStatus, y = Count)) +
+        ggplot2::geom_col(ggplot2::aes(fill = PubStatus)) +
+        ggplot2::geom_text(
+            ggplot2::aes(label = Label),
+            vjust  = 1.5,
+            size   = 5,
+            colour = "white"
+        ) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            legend.position = "none",
+            axis.title = ggplot2::element_blank(),
+            axis.text  = ggplot2::element_blank(),
+            panel.grid = ggplot2::element_blank()
         )
 }

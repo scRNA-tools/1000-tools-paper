@@ -97,7 +97,7 @@ plot_sankey <- function(data, value, colour, width = 0.1, space = 0.05) {
             ) %>%
             dplyr::mutate(
                 PctStr = format(
-                    Total / sum(Total) * 100, 1,
+                    Total / sum(Total) * 100,
                     digits = 1,
                     nsmall = 1
                 ),

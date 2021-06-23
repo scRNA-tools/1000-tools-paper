@@ -159,5 +159,9 @@ list(
     tar_target(
         delay_plot,
         plot_publication_delay(doi_idx, references)
+    ),
+    tar_target(
+        pub_status_plot,
+        plot_publication_status(tools)
     )
 )
