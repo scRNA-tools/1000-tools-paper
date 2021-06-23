@@ -155,5 +155,9 @@ list(
     tar_target(
         tools_plot,
         plot_tools_over_time(tools)
+    ),
+    tar_target(
+        delay_plot,
+        plot_publication_delay(doi_idx, references)
     )
 )

@@ -32,17 +32,11 @@ plot_landscape_umap <- function(mfa, hcpc, umap) {
 #'
 #' @return ggplot object
 plot_tools_over_time <- function(tools) {
-    plot_data <- tools %>%
-        dplyr::select(Date = Added) %>%
-        dplyr::group_by(Date) %>%
-        dplyr::summarise(Count = dplyr::n(), .groups = "drop") %>%
-        tidyr::complete(
-            Date = tidyr::full_seq(Date, 1),
-            fill = list(Count = 0)
-        ) %>%
-        dplyr::mutate(Total = cumsum(Count))
 
-    ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Date, y = .data$Total)) +
+    ggplot2::ggplot(
+        get_date_totals(tools),
+        ggplot2::aes(x = .data$Date, y = .data$Total)
+    ) +
         ggplot2::geom_vline(
             xintercept = lubridate::ymd("2018-06-25"),
             colour = "red"
@@ -62,4 +56,96 @@ plot_tools_over_time <- function(tools) {
             y = "Number of tools in database"
         ) +
         ggplot2::theme_minimal()
+}
+
+#' Get date counts
+#'
+#' Get the total number of tools in the database at each date
+#'
+#' @param tools data.frame containing tools data
+#'
+#' @return data.frame with total number of tools per date
+get_date_totals <- function(tools) {
+    tools %>%
+        dplyr::select(Date = Added) %>%
+        dplyr::group_by(Date) %>%
+        dplyr::summarise(Count = dplyr::n(), .groups = "drop") %>%
+        tidyr::complete(
+            Date = tidyr::full_seq(Date, 1),
+            fill = list(Count = 0)
+        ) %>%
+        dplyr::mutate(Total = cumsum(Count))
+}
+
+#' Plot publication delay
+#'
+#' Create a raincloud plot showing the number of days between the first preprint
+#' for a tool and the first publication
+#'
+#' @param doi_idx data.frame containg DOI index
+#' @param references data.frame containing references data
+#'
+#' @return ggplot object
+plot_publication_delay <- function(doi_idx, references) {
+
+    delays <- doi_idx %>%
+        dplyr::left_join(references, by = "DOI") %>%
+        dplyr::group_by(Tool, Preprint) %>%
+        dplyr::slice_min(Date) %>%
+        dplyr::group_by(Tool) %>%
+        dplyr::select(Tool, Preprint, Date) %>%
+        dplyr::mutate(
+            Preprint = dplyr::if_else(Preprint, "Preprint", "Publication")
+        ) %>%
+        tidyr::pivot_wider(
+            id_cols     = "Tool",
+            names_from  = "Preprint",
+            values_from = "Date"
+        ) %>%
+        dplyr::filter(
+            !is.na(Preprint),
+            !is.na(Publication),
+            Publication > Preprint
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(
+            Delay = as.numeric(Publication - Preprint, units = "days")
+        )
+
+    ggplot2::ggplot(delays, ggplot2::aes(x = Delay)) +
+        ggdist::stat_halfeye(
+            adjust        = 1,
+            width         = 0.6,
+            justification = -0.1,
+            .width        = 0,
+            point_colour  = NA
+        ) +
+        ggplot2::geom_boxplot(
+            width         = 0.1,
+            outlier.shape = NA
+        ) +
+        ggdist::geom_dots(
+            # ggplot2::aes(
+            #     fill   = factor(lubridate::year(Publication)),
+            #     group = NA
+            # ),
+            side          = "bottom",
+            justification = 1.1,
+            binwidth      = 10,
+            layout        = "weave",
+            stackratio    = 1.1
+        ) +
+        ggplot2::scale_x_continuous(breaks = seq(0, 1000, 100)) +
+        ggplot2::coord_cartesian(ylim = c(-0.5, NA)) +
+        ggplot2::labs(
+            x = "Days between first preprint and first publication"
+        ) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.title.y       = ggplot2::element_blank(),
+            axis.text.y        = ggplot2::element_blank(),
+            panel.grid.minor.x = ggplot2::element_blank(),
+            panel.grid.major.y = ggplot2::element_blank(),
+            panel.grid.minor.y = ggplot2::element_blank()
+        )
 }
