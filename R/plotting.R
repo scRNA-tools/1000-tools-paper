@@ -43,7 +43,7 @@ plot_tools_over_time <- function(tools) {
         ) +
         ggplot2::annotate(
             "text",
-            x = lubridate::ymd("2018-06-25"),
+            x = lubridate::ymd("2018-06-06"),
             y = Inf,
             label = "scRNA-tools publication",
             angle = 90,
@@ -79,38 +79,31 @@ get_date_totals <- function(tools) {
 
 #' Plot publication delay
 #'
-#' Create a raincloud plot showing the number of days between the first preprint
-#' for a tool and the first publication
+#' Create a raincloud plot showing the number of days between preprints and
+#' linked publications
 #'
-#' @param doi_idx data.frame containing DOI index
+#' @param ref_links data.frame containing reference links
 #' @param references data.frame containing references data
 #'
 #' @return ggplot object
-plot_publication_delay <- function(doi_idx, references) {
+plot_publication_delay <- function(ref_links, references) {
 
-    delays <- doi_idx %>%
-        dplyr::left_join(references, by = "DOI") %>%
-        dplyr::group_by(Tool, Preprint) %>%
-        dplyr::slice_min(Date) %>%
-        dplyr::group_by(Tool) %>%
-        dplyr::select(Tool, Preprint, Date) %>%
+    delays <- ref_links %>%
+        dplyr::filter(Correct) %>%
+        dplyr::left_join(references, by = c(Preprint = "DOI")) %>%
+        dplyr::select(Preprint, Publication, PreprintDate = Date) %>%
+        dplyr::left_join(
+            references,
+            by = c(Publication = "DOI"),
+            suffix = c("", "Is")
+        ) %>%
+        dplyr::select(
+            Preprint, Publication, PreprintDate, PublicationDate = Date
+        ) %>%
         dplyr::mutate(
-            Preprint = dplyr::if_else(Preprint, "Preprint", "Publication")
+            Delay = as.numeric(PublicationDate - PreprintDate, units = "days")
         ) %>%
-        tidyr::pivot_wider(
-            id_cols     = "Tool",
-            names_from  = "Preprint",
-            values_from = "Date"
-        ) %>%
-        dplyr::filter(
-            !is.na(Preprint),
-            !is.na(Publication),
-            Publication > Preprint
-        ) %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(
-            Delay = as.numeric(Publication - Preprint, units = "days")
-        )
+        dplyr::filter(Delay > 0)
 
     ggplot2::ggplot(delays, ggplot2::aes(x = Delay)) +
         ggdist::stat_halfeye(
@@ -135,10 +128,10 @@ plot_publication_delay <- function(doi_idx, references) {
             layout        = "weave",
             stackratio    = 1.1
         ) +
-        ggplot2::scale_x_continuous(breaks = seq(0, 1000, 100)) +
+        ggplot2::scale_x_continuous(breaks = seq(0, 1500, 100)) +
         ggplot2::coord_cartesian(ylim = c(-0.5, NA)) +
         ggplot2::labs(
-            x = "Days between first preprint and first publication"
+            x = "Days between preprint and publication"
         ) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
@@ -216,7 +209,7 @@ plot_gh_stats <- function(tools) {
 
     stats <- tibble::tribble(
                 ~ Stat,                                      ~ Value,
-               "Repos",                    sum(!is.na(tools$GitHub)),
+               "Repos",                            sum(tools$GitHub),
               "Owners",                length(unique(tools$GHOwner)),
         "Contributors",      sum(tools$GHContributors, na.rm = TRUE),
              "Commits",           sum(tools$GHCommits, na.rm = TRUE),

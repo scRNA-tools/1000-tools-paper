@@ -10,7 +10,8 @@ update_references <- function(references) {
 
     works <- purrr::map_dfr(references$DOI[!references$arXiv], function(.doi) {
         message("Getting DOI ", .doi, "...")
-        rcrossref::cr_works(dois = .doi)$data
+        rcrossref::cr_works(dois = .doi)$data %>%
+            dplyr::mutate(DOI = .doi)
     })
 
     works <- works %>%
@@ -28,7 +29,7 @@ update_references <- function(references) {
             Citations       = as.numeric(is.referenced.by.count),
             CitationsPerDay = Citations / as.numeric(lubridate::today() - Date)
         ) %>%
-        dplyr::select(DOI = doi, Date, Citations, CitationsPerDay)
+        dplyr::select(DOI, Date, Citations, CitationsPerDay)
 
     references %>%
         dplyr::select(-Date) %>%

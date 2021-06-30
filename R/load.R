@@ -67,6 +67,22 @@ load_doi_idx <- function(file) {
     )
 }
 
+#' Load reference links
+#'
+#' @param file Path to reference TSV file, passed to `readr::read_tsv()`
+#'
+#' @return tibble containing DOI index
+load_ref_links <- function(file) {
+    readr::read_tsv(
+        file,
+        col_types = readr::cols(
+            Preprint    = readr::col_character(),
+            Publication = readr::col_character(),
+            Correct     = readr::col_logical()
+        )
+    )
+}
+
 #' Load repositories
 #'
 #' @param file Path to repositories TSV file, passed to `readr::read_tsv()`
@@ -95,7 +111,10 @@ load_repositories <- function(file) {
 load_github_repositories <- function(repositories) {
 
     # Clear missing repos log file
-    fs::file_delete(fs::path(here::here("_cache"), "missing_repos.tsv"))
+    missing_tsv <- fs::path(here::here("_cache"), "missing_repos.tsv")
+    if (fs::file_exists(missing_tsv)) {
+        fs::file_delete(missing_tsv)
+    }
 
     repos <- repositories %>%
         dplyr::filter(!is.na(GitHub)) %>%
@@ -104,15 +123,20 @@ load_github_repositories <- function(repositories) {
 
     get_repo_info_slowly <- purrr::slowly(
         get_repo_info,
-        rate = purrr::rate_delay(1)
+        rate = purrr::rate_delay(0.5)
     )
 
     purrr::map_dfr(repos, get_repo_info_slowly) %>%
         dplyr::mutate(
             # Add 1 to avoid negative scores
             IssueActivity = log10((ClosedIssues / AgeYears) + 1),
-            IssueResponse = max(MedianResponseDays, na.rm = TRUE) -
-                MedianResponseDays
+            IssueResponse = max(log10(MedianResponseDays), na.rm = TRUE) -
+                log10(MedianResponseDays),
+            Popularity = log10(
+                4 * (Forks / AgeYears) +
+                    (Stars / AgeYears) +
+                    1
+            )
         )
 }
 
@@ -180,6 +204,23 @@ load_doi_idx_sha <- function(sha) {
             "https://github.com/scRNA-tools/scRNA-tools/raw/",
             sha,
             "/database/doi-idx.tsv"
+        )
+    )
+}
+
+#' Load reference links from SHA
+#'
+#' Load the reference links table from GitHub corresponding to a specific commit
+#'
+#' @param sha SHA hash corresponding to a git commit
+#'
+#' @return tibble containing DOI index
+load_ref_links_sha <- function(sha) {
+    load_ref_links(
+        glue::glue(
+            "https://github.com/scRNA-tools/scRNA-tools/raw/",
+            sha,
+            "/database/reference-links.tsv"
         )
     )
 }

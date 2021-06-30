@@ -85,6 +85,15 @@ list(
         load_doi_idx_sha(doi_idx_sha)
     ),
     tar_target(
+        ref_links_sha,
+        get_path_sha("database/reference-links.tsv", date = date),
+        cue = tar_cue("always")
+    ),
+    tar_target(
+        ref_links,
+        load_ref_links_sha(ref_links_sha)
+    ),
+    tar_target(
         repositories,
         load_repositories_sha(repositories_sha)
     ),
@@ -158,7 +167,7 @@ list(
     ),
     tar_target(
         delay_plot,
-        plot_publication_delay(doi_idx, references)
+        plot_publication_delay(ref_links, references)
     ),
     tar_target(
         pub_status_plot,
