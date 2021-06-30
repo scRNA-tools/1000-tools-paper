@@ -176,5 +176,9 @@ list(
     tar_target(
         gh_stats_plot,
         plot_gh_stats(tools)
+    ),
+    tar_target(
+        category_props_plot,
+        plot_category_props(categories, tools)
     )
 )

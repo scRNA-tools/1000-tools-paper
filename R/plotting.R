@@ -246,3 +246,68 @@ plot_gh_stats <- function(tools) {
             panel.grid = ggplot2::element_blank()
         )
 }
+
+#' Plot category proportions
+#'
+#' Plot the proportion of tools in each category. Lines show the whole database
+#' and points show tools added in each year.
+#'
+#' @param categories data.frame containing categories data
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot object
+plot_category_props <- function(categories, tools) {
+
+    cats_summ <- categories %>%
+        dplyr::summarise(
+            dplyr::across(dplyr::starts_with("Cat"), sum, na.rm = TRUE)
+        ) %>%
+        tidyr::pivot_longer(
+            dplyr::starts_with("Cat"),
+            names_to  = "Category",
+            values_to = "Count"
+        ) %>%
+        dplyr::mutate(Category = stringr::str_remove(Category, "Cat")) %>%
+        dplyr::mutate(Prop = Count / nrow(tools)) %>%
+        dplyr::arrange(Prop) %>%
+        dplyr::mutate(Category = factor(Category, levels = unique(Category)))
+
+    cats_by_year <- tools %>%
+        dplyr::mutate(YearAdded = lubridate::year(Added)) %>%
+        dplyr::left_join(categories, by = "Tool") %>%
+        dplyr::select(Tool, YearAdded, dplyr::starts_with("Cat")) %>%
+        dplyr::group_by(YearAdded) %>%
+        dplyr::summarise(
+            Tools = dplyr::n(),
+            dplyr::across(dplyr::starts_with("Cat"), sum, na.rm = TRUE)
+        ) %>%
+        tidyr::pivot_longer(
+            dplyr::starts_with("Cat"),
+            names_to  = "Category",
+            values_to = "YearCount"
+        ) %>%
+        dplyr::mutate(Category = stringr::str_remove(Category, "Cat")) %>%
+        dplyr::mutate(YearProp = YearCount / Tools) %>%
+        dplyr::mutate(
+            Category = factor(Category, levels = levels(cats_summ$Category))
+        )
+
+    ggplot2::ggplot(cats_summ, ggplot2::aes(y = Category)) +
+        ggplot2::geom_point(
+            ggplot2::aes(x = Prop),
+            colour = "red",
+            shape  = "|",
+            size   = 5
+        ) +
+        ggplot2::geom_point(
+            data = cats_by_year,
+            ggplot2::aes(
+                x = YearProp,
+                fill = forcats::fct_rev(factor(YearAdded))
+            ),
+            shape = 21,
+            size  = 2
+        ) +
+        ggplot2::scale_fill_brewer(palette = "RdPu", name = "Year added") +
+        ggplot2::theme_minimal()
+}
