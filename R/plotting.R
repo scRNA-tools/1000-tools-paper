@@ -37,10 +37,27 @@ plot_tools_over_time <- function(tools) {
         get_date_totals(tools),
         ggplot2::aes(x = .data$Date, y = .data$Total)
     ) +
+        annotate_pub_date() +
+        ggplot2::geom_line(size = 1) +
+        ggplot2::labs(
+            y = "Number of tools in database"
+        ) +
+        ggplot2::theme_minimal()
+}
+
+#' Annotate publication date
+#'
+#' Add an annotation showing the date of the original scRNA-tools publication to
+#' a plot with dates on the x-axis
+#'
+#' @return list of ggproto object
+annotate_pub_date <- function() {
+
+    list(
         ggplot2::geom_vline(
             xintercept = lubridate::ymd("2018-06-25"),
             colour = "red"
-        ) +
+        ),
         ggplot2::annotate(
             "text",
             x = lubridate::ymd("2018-06-06"),
@@ -50,12 +67,8 @@ plot_tools_over_time <- function(tools) {
             hjust = 1.1,
             vjust = -0.5,
             colour = "red"
-        ) +
-        ggplot2::geom_line(size = 1) +
-        ggplot2::labs(
-            y = "Number of tools in database"
-        ) +
-        ggplot2::theme_minimal()
+        )
+    )
 }
 
 #' Get date counts
@@ -75,6 +88,78 @@ get_date_totals <- function(tools) {
             fill = list(Count = 0)
         ) %>%
         dplyr::mutate(Total = cumsum(Count))
+}
+
+#' Plot platforms over time
+#'
+#' Plot the proportion of tools for each platform over time
+#'
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot object
+plot_platforms_over_time <- function(tools) {
+
+    platform_dates <- tools %>%
+        dplyr::select(
+            Date = Added,
+            dplyr::starts_with("Platform"),
+            -Platform
+        ) %>%
+        dplyr::mutate(
+            PlatformOther = !(PlatformR | PlatformPy | PlatformCPP |
+                                  PlatformMATLAB)
+        ) %>%
+        tidyr::pivot_longer(
+            dplyr::starts_with("Platform"),
+            names_to     = "Platform",
+            names_prefix = "Platform",
+            values_to    = "Present"
+        ) %>%
+        dplyr::group_by(Date, Platform) %>%
+        dplyr::summarise(Count = sum(Present), .groups = "drop") %>%
+        dplyr::group_by(Date) %>%
+        tidyr::complete(
+            Date = tidyr::full_seq(Date, 1),
+            Platform,
+            fill = list(Count = 0)
+        ) %>%
+        dplyr::arrange(Platform, Date) %>%
+        dplyr::group_by(Platform) %>%
+        dplyr::mutate(PlatformTotal = cumsum(Count)) %>%
+        dplyr::ungroup() %>%
+        dplyr::left_join(get_date_totals(tools), by = "Date") %>%
+        dplyr::mutate(Prop = PlatformTotal / Total) %>%
+        dplyr::mutate(
+            Platform = factor(
+                Platform,
+                levels = c("R", "Py", "CPP", "MATLAB", "Other"),
+                labels = c("R", "Python", "C++", "MATLAB", "Other")
+            )
+        )
+
+    ggplot2::ggplot(
+        platform_dates,
+        ggplot2::aes(x = Date, y = Prop, colour = Platform)
+    ) +
+        annotate_pub_date() +
+        ggplot2::geom_line(size = 1) +
+        ggplot2::scale_y_continuous(labels = scales::percent) +
+        ggplot2::geom_text(
+            data = dplyr::filter(platform_dates, Date == dplyr::last(Date)),
+            ggplot2::aes(label = Platform),
+            hjust = -0.1
+        ) +
+        ggplot2::scale_x_date(
+            expand = ggplot2::expansion(mult = c(0.01, 0.1))
+        ) +
+        ggplot2::labs(
+            x = "Date",
+            y = "Percentage of tools in database"
+        ) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            legend.position = "none"
+        )
 }
 
 #' Plot publication delay

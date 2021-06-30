@@ -166,6 +166,10 @@ list(
         plot_tools_over_time(tools)
     ),
     tar_target(
+        platforms_time_plot,
+        plot_platforms_over_time(tools)
+    ),
+    tar_target(
         delay_plot,
         plot_publication_delay(ref_links, references)
     ),
