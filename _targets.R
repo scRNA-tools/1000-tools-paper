@@ -180,5 +180,9 @@ list(
     tar_target(
         category_props_plot,
         plot_category_props(categories, tools)
+    ),
+    tar_target(
+        category_barcodes_plot,
+        plot_category_barcodes(categories, tools)
     )
 )

@@ -311,3 +311,52 @@ plot_category_props <- function(categories, tools) {
         ggplot2::scale_fill_brewer(palette = "RdPu", name = "Year added") +
         ggplot2::theme_minimal()
 }
+
+#' Plot category barcodes
+#'
+#' Plot a barcode plot showing when tools where added to each category
+#'
+#' @param categories data.frame containing categories data
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot object
+plot_category_barcodes <- function(categories, tools) {
+
+    cats_summ <- categories %>%
+        dplyr::summarise(
+            dplyr::across(dplyr::starts_with("Cat"), sum, na.rm = TRUE)
+        ) %>%
+        tidyr::pivot_longer(
+            dplyr::starts_with("Cat"),
+            names_to  = "Category",
+            values_to = "Count"
+        ) %>%
+        dplyr::mutate(Category = stringr::str_remove(Category, "Cat")) %>%
+        dplyr::mutate(Prop = Count / nrow(tools)) %>%
+        dplyr::arrange(Prop) %>%
+        dplyr::mutate(Category = factor(Category, levels = unique(Category)))
+
+    cats_dates <- tools %>%
+        dplyr::left_join(categories, by = "Tool") %>%
+        dplyr::select(Added, dplyr::starts_with("Cat")) %>%
+        tidyr::pivot_longer(
+            dplyr::starts_with("Cat"),
+            names_to     = "Category",
+            values_to    = "Present",
+            names_prefix = "Cat"
+        ) %>%
+        dplyr::filter(Present) %>%
+        dplyr::mutate(
+            Category = factor(Category, levels = levels(cats_summ$Category))
+        )
+
+    ggplot2::ggplot(
+        cats_dates,
+        ggplot2::aes(x = Added, y = Category, colour = Category)
+    ) +
+        ggplot2::geom_point(alpha = 0.5, shape = "|", size = 5.5) +
+        # ggbeeswarm::geom_quasirandom(groupOnX = FALSE, alpha = 0.3) +
+        ggplot2::scale_colour_hue(l = 50) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(legend.position = "none")
+}
