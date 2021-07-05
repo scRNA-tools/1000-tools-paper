@@ -26,10 +26,16 @@ update_references <- function(references) {
             )
         ) %>%
         dplyr::mutate(
+            Abstract = abstract %>%
+                stringr::str_remove_all("<jats:title>.*?</jats:title>") %>%
+                stringr::str_remove_all("<[^>]*>") %>%
+                stringr::str_squish()
+        ) %>%
+        dplyr::mutate(
             Citations       = as.numeric(is.referenced.by.count),
             CitationsPerDay = Citations / as.numeric(lubridate::today() - Date)
         ) %>%
-        dplyr::select(DOI, Date, Citations, CitationsPerDay)
+        dplyr::select(DOI, Date, Abstract, Citations, CitationsPerDay)
 
     references %>%
         dplyr::select(-Date) %>%
