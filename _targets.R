@@ -13,6 +13,7 @@ source(here("R", "github.R"))
 source(here("R", "load.R"))
 source(here("R", "tools.R"))
 source(here("R", "references.R"))
+source(here("R", "analytics.R"))
 source(here("R", "sankey.R"))
 source(here("R", "mfa.R"))
 source(here("R", "plotting.R"))
@@ -106,6 +107,24 @@ list(
         augment_tools(tools_raw, references, doi_idx, repositories, gh_repos)
     ),
     tar_target(
+        ga_users,
+        {
+            googleAnalyticsR::ga_auth()
+            load_ga_users(date)
+        },
+        packages = "googleAnalyticsR",
+        cue      = tar_cue("always")
+    ),
+    tar_target(
+        ga_countries,
+        {
+            googleAnalyticsR::ga_auth()
+            load_ga_countries(date)
+        },
+        packages = "googleAnalyticsR",
+        cue      = tar_cue("always")
+    ),
+    tar_target(
         sankey,
         plot_sankey(
             data   = get_sankey_data(tools),
@@ -188,5 +207,13 @@ list(
     tar_target(
         category_barcodes_plot,
         plot_category_barcodes(categories, tools)
+    ),
+    tar_target(
+        users_plot,
+        plot_users(ga_users)
+    ),
+    tar_target(
+        users_map,
+        plot_users_map(ga_countries)
     )
 )
