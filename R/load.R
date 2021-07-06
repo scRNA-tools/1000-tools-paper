@@ -241,3 +241,51 @@ load_repositories_sha <- function(sha) {
         )
     )
 }
+
+#' Load Google Analytics users
+#'
+#' Load user information for scRNA-tools.org
+#'
+#' @param date Final date to get results for
+#'
+#' @return tibble with user stats
+load_ga_users <- function(date) {
+    ua_users  <- get_ga_users("155271574", type = "UA",  to_date = "2020-11-16")
+    ga4_users <- get_ga_users(252902717,   type = "GA4", to_date = date)
+
+    dplyr::bind_rows(ua_users, ga4_users)
+}
+
+#' Load Google Analytics countries
+#'
+#' Load country information for scRNA-tools.org
+#'
+#' @param date Final date to get results for
+#'
+#' @return tibble with country stats
+load_ga_countries <- function(date) {
+    ua_countries  <- get_ga_countries("155271574", type = "UA",
+                                      to_date = "2020-11-16")
+    ga4_countries <- get_ga_countries(252902717,   type = "GA4", to_date = date)
+
+    ua_countries %>%
+        dplyr::full_join(
+            ga4_countries,
+            by     = "Country",
+            suffix = c("UA", "GA4")
+        ) %>%
+        tidyr::replace_na(list(UsersUA = 0, UsersGA4 = 0)) %>%
+        dplyr::mutate(Users = UsersUA + UsersGA4) %>%
+        dplyr::mutate(Prop = Users / sum(Users)) %>%
+        dplyr::mutate(Country = dplyr::case_when(
+            Country == "Côte d’Ivoire"       ~ "Ivory Coast",
+            Country == "Czechia"             ~ "Czech Republic",
+            Country == "Macedonia (FYROM)"   ~ "Macedonia",
+            Country == "Myanmar (Burma)"     ~ "Myanmar",
+            Country == "Trinidad & Tobago"   ~ "Trinidad",
+            Country == "United Kingdom"      ~ "UK",
+            Country == "United States"       ~ "USA",
+            Country == "U.S. Virgin Islands" ~ "Virgin Islands",
+            TRUE                           ~ Country
+        ))
+}

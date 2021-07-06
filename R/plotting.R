@@ -445,3 +445,100 @@ plot_category_barcodes <- function(categories, tools) {
         ggplot2::theme_minimal() +
         ggplot2::theme(legend.position = "none")
 }
+
+#' Plot users
+#'
+#' Plot number of scRNA-tools.org users over time
+#'
+#' @param ga_users data.frame containing users data
+#'
+#' @return ggplot object
+plot_users <- function(ga_users) {
+    plot_data <- ga_users %>%
+        tidyr::pivot_longer(
+            dplyr::starts_with("Users"),
+            names_to = "Type",
+            values_to = "Users",
+            names_prefix = "Users"
+        ) %>%
+        dplyr::mutate(
+            Type = factor(
+                Type,
+                levels = c("Day", "Week", "Month")
+            )
+        )
+
+    ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(x = Date, y = Users, colour = Type, fill = Type)
+    ) +
+        annotate_pub_date() +
+        ggplot2::geom_point(size = 0.3, alpha = 0.5) +
+        ggplot2::geom_smooth(method = "loess", formula = "y ~ x") +
+        ggplot2::scale_x_date(
+            breaks = scales::pretty_breaks(n = 10),
+            date_labels = "%b %Y"
+        ) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.title.x = ggplot2::element_blank(),
+            legend.title = ggplot2::element_blank()
+        )
+}
+
+#' Plot users map
+#'
+#' Plot a map showing which countries scRNA-tools.org users come from
+#'
+#' @param ga_countries data.frame containing countries data
+#'
+#' @return ggplot object
+plot_users_map <- function(ga_countries) {
+    world <- ggplot2::map_data("world")
+
+    china <- world %>%
+        dplyr::filter(region == "China") %>%
+        dplyr::mutate(
+            region = dplyr::case_when(
+                subregion == "Hong Kong" ~ "Hong Kong",
+                subregion == "Macao"     ~ "Macao",
+                TRUE                     ~ region
+            )
+        )
+
+    world <- world %>%
+        dplyr::filter(region != "China") %>%
+        dplyr::bind_rows(china)
+
+    ga_countries <- ga_countries %>%
+        dplyr::filter(Country != "(not set)")
+
+    if (!all(ga_countries$Country %in% world$region)) {
+        stop("Some countries not matched")
+    }
+
+    plot_data <- dplyr::left_join(
+        world,
+        ga_countries,
+        by = c(region = "Country")
+    )
+
+    ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(x = long, y = lat, group = group, fill = Prop)
+    ) +
+        ggplot2::geom_polygon() +
+        ggplot2::scale_fill_viridis_c(na.value = "grey80") +
+        ggplot2::coord_fixed(expand = FALSE) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.title        = ggplot2::element_blank(),
+            axis.text         = ggplot2::element_blank(),
+            axis.ticks        = ggplot2::element_blank(),
+            axis.ticks.length = grid::unit(0, "pt"),
+            panel.grid        = ggplot2::element_blank(),
+            legend.position   = "none",
+            legend.key.width  = grid::unit(1, "cm"),
+            plot.margin       = grid::unit(c(0, 0, 0, 0), "mm")
+        )
+}
