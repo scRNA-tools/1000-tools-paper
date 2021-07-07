@@ -14,6 +14,7 @@ source(here("R", "load.R"))
 source(here("R", "tools.R"))
 source(here("R", "references.R"))
 source(here("R", "analytics.R"))
+source(here("R", "dependencies.R"))
 source(here("R", "sankey.R"))
 source(here("R", "mfa.R"))
 source(here("R", "plotting.R"))
@@ -125,6 +126,51 @@ list(
         cue      = tar_cue("always")
     ),
     tar_target(
+        johnnydep_path,
+        {
+            path <- Sys.getenv("JOHNNYDEP_PATH")
+            if (path == "") {
+                stop("johnnydep path not found. See README.")
+            }
+            path
+        }
+    ),
+    tar_target(
+        bioc_pkgs,
+        {
+            repositories %>%
+                dplyr::filter(!is.na(Bioc)) %>%
+                dplyr::pull(Bioc) %>%
+                unique()
+        }
+    ),
+    tar_target(
+        cran_pkgs,
+        {
+            repositories %>%
+                dplyr::filter(!is.na(CRAN)) %>%
+                dplyr::pull(CRAN) %>%
+                unique()
+        }
+    ),
+    tar_target(
+        pypi_pkgs,
+        {
+            repositories %>%
+                dplyr::filter(!is.na(PyPI)) %>%
+                dplyr::pull(PyPI) %>%
+                unique()
+        }
+    ),
+    tar_target(
+        r_dependencies,
+        get_r_deps(bioc_pkgs, cran_pkgs)
+    ),
+    tar_target(
+        pypi_dependencies,
+        get_pypi_deps(pypi_pkgs, johnnydep_path)
+    ),
+    tar_target(
         sankey,
         plot_sankey(
             data   = get_sankey_data(tools),
@@ -215,5 +261,9 @@ list(
     tar_target(
         users_map,
         plot_users_map(ga_countries)
+    ),
+    tar_target(
+        dependencies_plot,
+        plot_dependencies(r_dependencies, pypi_dependencies)
     )
 )

@@ -542,3 +542,65 @@ plot_users_map <- function(ga_countries) {
             plot.margin       = grid::unit(c(0, 0, 0, 0), "mm")
         )
 }
+
+#' Plot dependencies
+#'
+#' Plot a graph showing dependencies between packages
+#'
+#' @param r_dependencies data.frame with dependencies between R packages
+#' @param pypi_dependencies data.frame with dependencies between PyPI packages
+#'
+#' @return ggplot2 object
+plot_dependencies <- function(r_dependencies, pypi_dependencies) {
+
+    bioc_pkgs <- BiocPkgTools::biocPkgList()
+
+    r_nodes <- tibble::tibble(
+        Package = sort(unique(c(r_dependencies$From, r_dependencies$To)))
+    ) %>%
+        dplyr::mutate(
+            Repo = dplyr::if_else(
+                Package %in% bioc_pkgs$Package,
+                "Bioconductor",
+                "CRAN"
+            )
+        )
+
+    py_nodes <- tibble::tibble(
+        Package = sort(unique(c(pypi_dependencies$From, pypi_dependencies$To)))
+    ) %>%
+        dplyr::mutate(Repo = "PyPI")
+
+    nodes <- dplyr::bind_rows(r_nodes, py_nodes) %>%
+        dplyr::arrange(Package)
+    edges <- dplyr::bind_rows(r_dependencies, pypi_dependencies)
+
+    graph <- tidygraph::tbl_graph(nodes = nodes, edges = edges) %>%
+        tidygraph::activate(nodes) %>%
+        tidygraph::mutate(
+            Degree = tidygraph::centrality_degree(mode = "total"),
+            Centrality = tidygraph::centrality_pagerank()
+        ) %>%
+        tidygraph::mutate(IsCentral = Centrality > 0.005)
+
+    set.seed(1)
+    ggraph::ggraph(graph, layout = "fr") +
+        ggraph::geom_edge_fan(
+            ggplot2::aes(colour = Type),
+            width   = 0.2,
+            arrow   = grid::arrow(length = grid::unit(2, "mm")),
+            end_cap = ggraph::circle(1, "mm")
+        ) +
+        ggraph::geom_node_point(ggplot2::aes(colour = Repo, size = Degree)) +
+        ggraph::geom_node_label(
+            ggplot2::aes(label = Package, colour = Repo, alpha = IsCentral),
+            repel = TRUE,
+            size = 2,
+            box.padding = 0.1,
+            label.padding = 0.1,
+            max.overlaps = 100
+        ) +
+        ggplot2::scale_alpha_manual(values = c(0, 1)) +
+        ggraph::scale_edge_color_brewer(palette = "Dark2") +
+        ggraph::theme_graph()
+}
