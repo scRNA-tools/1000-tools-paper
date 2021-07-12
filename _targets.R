@@ -255,6 +255,10 @@ list(
         plot_category_barcodes(categories, tools)
     ),
     tar_target(
+        category_trend_plot,
+        plot_category_prop_trend(categories, tools)
+    ),
+    tar_target(
         users_plot,
         plot_users(ga_users)
     ),

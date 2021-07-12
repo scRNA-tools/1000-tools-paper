@@ -446,6 +446,79 @@ plot_category_barcodes <- function(categories, tools) {
         ggplot2::theme(legend.position = "none")
 }
 
+#' Plot category proportion trend
+#'
+#' Plot a scatter plot showing the trend in proportion of tools added to the
+#' scRNA-tools database over time against the overall proportion of tools in
+#' the database
+#'
+#' @param categories data.frame containing categories data
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot object
+plot_category_prop_trend <- function(categories, tools) {
+
+    cats_dates <- tools %>%
+        dplyr::left_join(categories, by = "Tool") %>%
+        dplyr::select(Added, dplyr::starts_with("Cat")) %>%
+        tidyr::pivot_longer(
+            dplyr::starts_with("Cat"),
+            names_to     = "Category",
+            values_to    = "Present",
+            names_prefix = "Cat"
+        ) %>%
+        dplyr::filter(Present)
+
+    tools_quarter <- tools %>%
+        dplyr::mutate(Quarter = lubridate::quarter(Added, with_year = TRUE)) %>%
+        dplyr::group_by(Quarter) %>%
+        dplyr::count(name = "TotalCount")
+
+    cats_quarter <- cats_dates %>%
+        dplyr::mutate(Quarter = lubridate::quarter(Added, with_year = TRUE)) %>%
+        dplyr::group_by(Quarter, Category) %>%
+        dplyr::count(name = "Count") %>%
+        dplyr::group_by(Quarter) %>%
+        tidyr::complete(Quarter, Category, fill = list(Count = 0)) %>%
+        dplyr::left_join(tools_quarter, by = "Quarter") %>%
+        dplyr::mutate(Prop = Count / TotalCount) %>%
+        dplyr::arrange(Quarter) %>%
+        dplyr::mutate(
+            QuarterYear = floor(Quarter),
+            NumQuarter = dplyr::case_when(
+                round(Quarter %% 1 * 10) == 1 ~ QuarterYear + 0.25,
+                round(Quarter %% 1 * 10) == 2 ~ QuarterYear + 0.50,
+                round(Quarter %% 1 * 10) == 3 ~ QuarterYear + 0.75,
+                round(Quarter %% 1 * 10) == 4 ~ QuarterYear + 1.00,
+            )
+        ) %>%
+        dplyr::ungroup()
+
+    cats_slopes <- cats_quarter %>%
+        dplyr::filter(Quarter < max(Quarter)) %>%
+        dplyr::group_by(Category) %>%
+        tidyr::nest() %>%
+        dplyr::mutate(model = purrr::map(data, ~ lm(Prop ~ NumQuarter, data = .x))) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(Slope = purrr::map_dbl(model, ~ .x$coefficients[2])) %>%
+        dplyr::arrange(Slope) %>%
+        dplyr::left_join(cats_summ, by = "Category")
+
+    ggplot2::ggplot(
+        cats_slopes,
+        ggplot2::aes(x = Prop, y = Slope, label = Category, colour = Category)
+    ) +
+        ggplot2::geom_hline(yintercept = 0, colour = "red") +
+        ggplot2::geom_point() +
+        ggrepel::geom_text_repel() +
+        ggplot2::labs(
+            x = "Proportion of tools in database",
+            y = "Trend in proportion over time"
+        ) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(legend.position = "none")
+}
+
 #' Plot users
 #'
 #' Plot number of scRNA-tools.org users over time
