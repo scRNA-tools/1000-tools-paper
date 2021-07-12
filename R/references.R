@@ -32,10 +32,17 @@ update_references <- function(references) {
                 stringr::str_squish()
         ) %>%
         dplyr::mutate(
+            NumAuthors      = length(author[[1]]),
+            NumReferences   = as.numeric(reference.count),
+            Days            = as.numeric(lubridate::today() - Date),
+            Years           = Days / 365.25,
             Citations       = as.numeric(is.referenced.by.count),
-            CitationsPerDay = Citations / as.numeric(lubridate::today() - Date)
+            CitationsPerDay = Citations / Days
         ) %>%
-        dplyr::select(DOI, Date, Abstract, Citations, CitationsPerDay)
+        dplyr::select(
+            DOI, Date, Abstract, Days, Years, NumAuthors, NumReferences,
+            Citations, CitationsPerDay
+        )
 
     references %>%
         dplyr::select(-Date) %>%

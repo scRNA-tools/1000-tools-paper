@@ -154,6 +154,7 @@ get_repo_contributors <- function(repo) {
     tibble::tibble(
         Repo         = repo,
         Contributors = length(result),
+        Logins       = list(purrr::map_chr(result, ~ .x$author$login)),
         Commits      = sum(purrr::map_dbl(result, ~ .x$total))
     )
 }
