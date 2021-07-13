@@ -450,13 +450,27 @@ plot_category_barcodes <- function(categories, tools) {
 #'
 #' Plot a scatter plot showing the trend in proportion of tools added to the
 #' scRNA-tools database over time against the overall proportion of tools in
-#' the database
+#' the database.
 #'
 #' @param categories data.frame containing categories data
 #' @param tools data.frame containing tools data
 #'
 #' @return ggplot object
 plot_category_prop_trend <- function(categories, tools) {
+
+    cats_summ <- categories %>%
+        dplyr::summarise(
+            dplyr::across(dplyr::starts_with("Cat"), sum, na.rm = TRUE)
+        ) %>%
+        tidyr::pivot_longer(
+            dplyr::starts_with("Cat"),
+            names_to  = "Category",
+            values_to = "Count"
+        ) %>%
+        dplyr::mutate(Category = stringr::str_remove(Category, "Cat")) %>%
+        dplyr::mutate(Prop = Count / nrow(tools)) %>%
+        dplyr::arrange(Prop) %>%
+        dplyr::mutate(Category = factor(Category, levels = unique(Category)))
 
     cats_dates <- tools %>%
         dplyr::left_join(categories, by = "Tool") %>%
@@ -498,7 +512,9 @@ plot_category_prop_trend <- function(categories, tools) {
         dplyr::filter(Quarter < max(Quarter)) %>%
         dplyr::group_by(Category) %>%
         tidyr::nest() %>%
-        dplyr::mutate(model = purrr::map(data, ~ lm(Prop ~ NumQuarter, data = .x))) %>%
+        dplyr::mutate(
+            model = purrr::map(data, ~ lm(Prop ~ NumQuarter, data = .x))
+        ) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(Slope = purrr::map_dbl(model, ~ .x$coefficients[2])) %>%
         dplyr::arrange(Slope) %>%
