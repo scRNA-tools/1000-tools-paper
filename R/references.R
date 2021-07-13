@@ -10,8 +10,21 @@ update_references <- function(references) {
 
     works <- purrr::map_dfr(references$DOI[!references$arXiv], function(.doi) {
         message("Getting DOI ", .doi, "...")
-        rcrossref::cr_works(dois = .doi)$data %>%
+
+        cr_works <- rcrossref::cr_works(dois = .doi)$data %>%
             dplyr::mutate(DOI = .doi)
+
+        altmetric <- try(
+            rAltmetric::altmetrics(doi = .doi) %>% rAltmetric::altmetric_data()
+        )
+
+        if (is(altmetric, "try-error")) {
+            cr_works$Altmetric <- NA
+        } else {
+            cr_works$Altmetric <- as.numeric(altmetric$score)
+        }
+
+        cr_works
     })
 
     works <- works %>%
@@ -32,7 +45,7 @@ update_references <- function(references) {
                 stringr::str_squish()
         ) %>%
         dplyr::mutate(
-            NumAuthors      = length(author[[1]]),
+            NumAuthors      = purrr::map_dbl(author, ~ nrow(.x)),
             NumReferences   = as.numeric(reference.count),
             Days            = as.numeric(lubridate::today() - Date),
             Years           = Days / 365.25,
@@ -41,7 +54,7 @@ update_references <- function(references) {
         ) %>%
         dplyr::select(
             DOI, Date, Abstract, Days, Years, NumAuthors, NumReferences,
-            Citations, CitationsPerDay
+            Citations, CitationsPerDay, Altmetric
         )
 
     references %>%
