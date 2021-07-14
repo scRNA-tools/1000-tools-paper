@@ -244,7 +244,7 @@ list(
     ),
     tar_target(
         gh_stats_plot,
-        plot_gh_stats(tools)
+        plot_gh_stats(gh_repos)
     ),
     tar_target(
         category_props_plot,

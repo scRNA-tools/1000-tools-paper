@@ -287,18 +287,22 @@ plot_publication_status <- function(tools) {
 #'
 #' Create a text plot of some GitHub summary statistics
 #'
-#' @param tools data.frame containing tools data
+#' @param gh_repos data.frame containing GitHub repositories data
 #'
 #' @return ggplot object
-plot_gh_stats <- function(tools) {
+plot_gh_stats <- function(gh_repos) {
+
+    n_commits <- sum(gh_repos$Commits, na.rm = TRUE)
+    n_issues  <- sum(gh_repos$Issues, na.rm = TRUE)
 
     stats <- tibble::tribble(
-                ~ Stat,                                      ~ Value,
-               "Repos",                            sum(tools$GitHub),
-              "Owners",                length(unique(tools$GHOwner)),
-        "Contributors",      sum(tools$GHContributors, na.rm = TRUE),
-             "Commits",           sum(tools$GHCommits, na.rm = TRUE),
-               "Hours", sum(tools$GHCommits, na.rm = TRUE) * 10 / 60
+                ~ Stat,                                 ~ Value,
+               "Repos",                          nrow(gh_repos),
+              "Owners",          length(unique(gh_repos$Owner)),
+        "Contributors", length(unique(unlist(gh_repos$Logins))),
+             "Commits",                               n_commits,
+              "Issues",                                n_issues,
+               "Hours",        (n_commits + n_issues) * 10 / 60
     ) %>%
         dplyr::mutate(Stat = factor(Stat, levels = Stat)) %>%
         dplyr::mutate(
