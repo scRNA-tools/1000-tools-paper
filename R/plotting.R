@@ -624,7 +624,7 @@ plot_users_map <- function(ga_countries) {
 
     ggplot2::ggplot(
         plot_data,
-        ggplot2::aes(x = long, y = lat, group = group, fill = Prop)
+        ggplot2::aes(x = long, y = lat, group = group, fill = log10(Prop))
     ) +
         ggplot2::geom_polygon() +
         ggplot2::scale_fill_viridis_c(na.value = "grey80") +
