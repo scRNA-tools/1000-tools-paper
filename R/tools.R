@@ -100,6 +100,7 @@ add_references <- function(tools, references, doi_idx) {
             Publications        = sum(!Preprint),
             Preprints           = sum(Preprint),
             TotalCitations      = sum(Citations, na.rm = TRUE),
+            TotalAltmetric      = sum(Altmetric, na.rm = TRUE),
             MeanCitationsPerDay = mean(CitationsPerDay, na.rm = TRUE)
         )
 

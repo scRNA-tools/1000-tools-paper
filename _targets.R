@@ -269,5 +269,13 @@ list(
     tar_target(
         dependencies_plot,
         plot_dependencies(r_dependencies, pypi_dependencies)
+    ),
+    tar_target(
+        publications_models_plot,
+        plot_publications_models(references, ref_links)
+    ),
+    tar_target(
+        tools_models_plot,
+        plot_tools_models(tools)
     )
 )

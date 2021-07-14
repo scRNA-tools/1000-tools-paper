@@ -693,3 +693,229 @@ plot_dependencies <- function(r_dependencies, pypi_dependencies) {
         ggraph::scale_edge_color_brewer(palette = "Dark2") +
         ggraph::theme_graph()
 }
+
+#' Plot publications models
+#'
+#' Plot coefficients for linear models predicting citations and Altmetric score
+#' for publications using [ggstatsplot::ggcoefstats()].
+#'
+#' @param references data.frame containing references data
+#' @param ref_links data.frame containing publication-preprint links
+#'
+#' @details
+#' Uses a simplified version of the model from Fu and Hughey 10.7554/eLife.52646
+#' which excludes terms about affiliation, last author and MeSH keywords. The
+#' model for citations looks like:
+#'
+#' `log(Citations + 1) ~ log2(NumReferences + 1) + log2(NumAuthors) +
+#' HasPreprint + splines::ns(Years, df = 3)`
+#'
+#' The Altmetric score model is the same with Altmetric score replacing
+#' citations.
+#'
+#' @return ggplot2 object
+plot_publications_models <- function(references, ref_links) {
+
+    model_data <- references %>%
+        dplyr::filter(
+            !Preprint,
+            Years > 0
+        ) %>%
+        dplyr::mutate(HasPreprint = DOI %in% ref_links$Publication) %>%
+        dplyr::select(HasPreprint, Years, NumAuthors, NumReferences, Citations,
+                      Altmetric)
+
+    citations_model <- lm(
+        log2(Citations + 1) ~
+            log2(NumReferences + 1) +
+            log2(NumAuthors) +
+            HasPreprint +
+            splines::ns(Years, df = 3),
+        data = model_data
+    ) %>%
+        ggstatsplot::ggcoefstats(output = "tidy") %>%
+        dplyr::mutate(Type = "Citations")
+
+    altmetric_model <- lm(
+        log2(Altmetric + 1) ~
+            log2(NumReferences + 1) +
+            log2(NumAuthors) +
+            HasPreprint +
+            splines::ns(Years, df = 3),
+        data = dplyr::filter(model_data, !is.na(Altmetric))
+    ) %>%
+        ggstatsplot::ggcoefstats(output = "tidy") %>%
+        dplyr::mutate(Type = "Altmetric")
+
+    term_labels <- c(
+        "splines::ns(Years, df = 3)3" = "Years (3rd degree)",
+        "splines::ns(Years, df = 3)2" = "Years (2nd degree)",
+        "splines::ns(Years, df = 3)1" = "Years (1st degree)",
+        "HasPreprintTRUE"             = "Has preprint",
+        "log2(NumAuthors)"            = "log2(Num authors)",
+        "log2(NumReferences + 1)"     = "log2(Num references + 1)"
+    )
+
+    models <- dplyr::bind_rows(citations_model, altmetric_model)
+
+    ggplot2::ggplot(
+        models,
+        ggplot2::aes(
+            x      = estimate,
+            y      = term,
+            colour = Type,
+            shape  = p.value < 0.05,
+            size   = p.value < 0.05
+        )
+    ) +
+        ggplot2::geom_vline(
+            xintercept = 0,
+            linetype   = "dashed",
+            colour     = "red",
+            size       = 1
+        ) +
+        ggplot2::geom_errorbarh(
+            ggplot2::aes(xmin = conf.low, xmax = conf.high),
+            position = ggplot2::position_dodge(width = 0.5),
+            size     = 0.5,
+            height   = 0.2
+        ) +
+        ggplot2::geom_point(
+            position = ggplot2::position_dodge2(width = 0.5),
+            stroke   = 1,
+            fill     = "white"
+        ) +
+        ggplot2::scale_y_discrete(labels = term_labels) +
+        ggplot2::scale_shape_manual(values = c(21, 16)) +
+        ggplot2::scale_size_manual(values = c(2.2, 3)) +
+        ggplot2::labs(x = "Coefficient") +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.title.y    = ggplot2::element_blank(),
+            legend.position = "bottom"
+        )
+}
+
+#' Plot tools models
+#'
+#' Plot coefficients for linear models predicting citations, Altmetric score and
+#' GitHub popularity for tools using [ggstatsplot::ggcoefstats()].
+#'
+#' @param tools data.frame containing tools data
+#'
+#' @details
+#' Uses a model inspired by the model from Fu and Hughey 10.7554/eLife.52646
+#' for publications. The model for citations looks like:
+#'
+#' `log(Citations + 1) ~ Platform + HasRepo + splines::ns(GHAgeYears, df = 3)`
+#'
+#' The Altmetric score and GitHub popularity models are the same with those
+#' values replacing citations.
+#'
+#' @return ggplot2 object
+plot_tools_models <- function(tools) {
+
+    model_data <- tools %>%
+        dplyr::mutate(
+            Platform     = dplyr::case_when(
+                PlatformR & PlatformPy ~ "Both",
+                PlatformR              ~ "R",
+                PlatformPy             ~ "Python",
+                TRUE                   ~ "Other"
+            ),
+            HasRepo       = Bioc | CRAN | PyPI,
+            GHPopularity  = GHPopularity / log10(2) # Change to log base 2
+        ) %>%
+        dplyr::mutate(
+            Platform = factor(
+                Platform,
+                levels = c("Other", "R", "Python", "Both")
+            )
+        ) %>%
+        dplyr::select(
+            Platform, HasRepo, GHAgeYears, TotalCitations, TotalAltmetric,
+            GHPopularity
+        )
+
+    citations_model <- lm(
+        log2(TotalCitations + 1) ~
+            Platform +
+            HasRepo +
+            splines::ns(GHAgeYears, df = 3),
+        data = dplyr::filter(model_data, !is.na(TotalCitations))
+    ) %>%
+        ggstatsplot::ggcoefstats(output = "tidy") %>%
+        dplyr::mutate(Type = "Citations")
+
+    altmetric_model <- lm(
+        log2(TotalAltmetric + 1) ~
+            Platform +
+            HasRepo +
+            splines::ns(GHAgeYears, df = 3),
+        data = dplyr::filter(model_data, !is.na(TotalAltmetric))
+    ) %>%
+        ggstatsplot::ggcoefstats(output = "tidy") %>%
+        dplyr::mutate(Type = "Altmetric")
+
+    popularity_model <- lm(
+        GHPopularity ~
+            Platform +
+            HasRepo +
+            splines::ns(GHAgeYears, df = 3),
+        data =dplyr::filter(model_data, !is.na(GHPopularity))
+    ) %>%
+        ggstatsplot::ggcoefstats(output = "tidy") %>%
+        dplyr::mutate(Type = "GHPopularity")
+
+    term_labels <- c(
+        "(Intercept)"                      = "(Intercept)",
+        "PlatformR"                        = "Platform (R)",
+        "PlatformPython"                   = "Platform (Python)",
+        "PlatformBoth"                     = "Platform (Both)",
+        "HasRepoTRUE"                      = "Has repository",
+        "splines::ns(GHAgeYears, df = 3)3" = "Years (3rd degree)",
+        "splines::ns(GHAgeYears, df = 3)2" = "Years (2nd degree)",
+        "splines::ns(GHAgeYears, df = 3)1" = "Years (1st degree)"
+    )
+
+    models <- dplyr::bind_rows(
+        citations_model, altmetric_model, popularity_model
+    )
+
+    ggplot2::ggplot(
+        models,
+        ggplot2::aes(
+            x      = estimate,
+            y      = term,
+            colour = Type,
+            shape  = p.value < 0.05,
+            size   = p.value < 0.05
+        )
+    ) +
+        ggplot2::geom_vline(
+            xintercept = 0,
+            linetype   = "dashed",
+            colour     = "red",
+            size       = 1
+        ) +
+        ggplot2::geom_errorbarh(
+            ggplot2::aes(xmin = conf.low, xmax = conf.high),
+            position = ggplot2::position_dodge(width = 0.5),
+            size     = 0.5,
+            height   = 0.2
+        ) +
+        ggplot2::geom_point(
+            position = ggplot2::position_dodge2(width = 0.5),
+            stroke   = 1,
+            fill     = "white"
+        ) +
+        ggplot2::scale_y_discrete(labels = term_labels) +
+        ggplot2::scale_shape_manual(values = c(21, 16)) +
+        ggplot2::scale_size_manual(values = c(2.2, 3)) +
+        ggplot2::labs(x = "Coefficient") +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.title.y    = ggplot2::element_blank(),
+            legend.position = "bottom"
+        )
+}
