@@ -179,53 +179,59 @@ plot_publication_delay <- function(ref_links, references) {
         dplyr::select(Preprint, Publication, PreprintDate = Date) %>%
         dplyr::left_join(
             references,
-            by = c(Publication = "DOI"),
+            by     = c(Publication = "DOI"),
             suffix = c("", "Is")
         ) %>%
         dplyr::select(
-            Preprint, Publication, PreprintDate, PublicationDate = Date
+            Preprint, Publication, PreprintDate, PublicationDate = Date,
+            Citations
         ) %>%
         dplyr::mutate(
             Delay = as.numeric(PublicationDate - PreprintDate, units = "days")
         ) %>%
         dplyr::filter(Delay > 0)
 
-    ggplot2::ggplot(delays, ggplot2::aes(x = Delay)) +
-        ggdist::stat_halfeye(
-            adjust        = 1,
-            width         = 0.6,
-            justification = -0.1,
-            .width        = 0,
-            point_colour  = NA
-        ) +
-        ggplot2::geom_boxplot(
-            width         = 0.1,
-            outlier.shape = NA
-        ) +
-        ggdist::geom_dots(
-            # ggplot2::aes(
-            #     fill   = factor(lubridate::year(Publication)),
-            #     group = NA
-            # ),
-            side          = "bottom",
-            justification = 1.1,
-            binwidth      = 10,
-            layout        = "weave",
-            stackratio    = 1.1
-        ) +
-        ggplot2::scale_x_continuous(breaks = seq(0, 1500, 100)) +
-        ggplot2::coord_cartesian(ylim = c(-0.5, NA)) +
-        ggplot2::labs(
-            x = "Days between preprint and publication"
-        ) +
+    scatter <- ggplot2::ggplot(
+        delays,
+        ggplot2::aes(x = PreprintDate, y = Delay, colour = log10(Citations))
+    ) +
+        ggplot2::geom_point() +
+        ggplot2::scale_colour_viridis_c(option = "plasma") +
         ggplot2::theme_minimal() +
         ggplot2::theme(
-            axis.title.y       = ggplot2::element_blank(),
-            axis.text.y        = ggplot2::element_blank(),
-            panel.grid.minor.x = ggplot2::element_blank(),
-            panel.grid.major.y = ggplot2::element_blank(),
-            panel.grid.minor.y = ggplot2::element_blank()
+            panel.background = ggplot2::element_rect(
+                colour = "grey30",
+                fill   = "NA"
+            ),
+            legend.position = "bottom"
         )
+
+    boxplot <- ggplot2::ggplot(delays, ggplot2::aes(y = Delay)) +
+        ggplot2::geom_boxplot(colour = "grey30") +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            panel.grid = ggplot2::element_blank(),
+            axis.title = ggplot2::element_blank(),
+            axis.text  = ggplot2::element_blank(),
+            axis.ticks = ggplot2::element_blank()
+        )
+
+    density <- ggplot2::ggplot(delays, ggplot2::aes(y = Delay)) +
+        ggplot2::geom_density(fill = "grey30", colour = NA) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            panel.grid = ggplot2::element_blank(),
+            axis.title = ggplot2::element_blank(),
+            axis.text  = ggplot2::element_blank(),
+            axis.ticks = ggplot2::element_blank()
+        )
+
+    patchwork::wrap_plots(
+        scatter,
+        boxplot,
+        density,
+        widths = c(4, 0.5, 1)
+    )
 }
 
 #' Plot publication status
