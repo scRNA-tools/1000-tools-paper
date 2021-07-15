@@ -929,3 +929,299 @@ plot_tools_models <- function(tools) {
             legend.position = "bottom"
         )
 }
+
+#' Plot platforms bar
+#'
+#' Plot a bar chart showing how many tools use different platforms
+#'
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot object
+plot_platforms_bar <- function(tools) {
+
+    plot_data <- tools %>%
+        dplyr::mutate(
+            RPython = dplyr::case_when(
+                PlatformR & PlatformPy ~ "Both",
+                PlatformR              ~ "R",
+                PlatformPy             ~ "Python",
+                TRUE                   ~ "Other"
+            ),
+            PlatformOther = !(PlatformR | PlatformPy | PlatformCPP |
+                                  PlatformMATLAB)
+        ) %>%
+        dplyr::select(
+            Tool,
+            dplyr::starts_with("Platform"),
+            -Platform,
+            RPython
+        ) %>%
+        dplyr::group_by(RPython) %>%
+        dplyr::summarise(dplyr::across(tidyselect:::where(is.logical), sum)) %>%
+        tidyr::pivot_longer(
+            -RPython,
+            names_to  = "Platform",
+            values_to = "Count"
+        ) %>%
+        dplyr::mutate(Platform = stringr::str_remove(Platform, "Platform")) %>%
+        dplyr::group_by(Platform) %>%
+        dplyr::mutate(Total = sum(Count)) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(
+            Platform = factor(
+                Platform,
+                levels = c("R", "Py", "Other", "MATLAB", "CPP"),
+                labels = c("R", "Python", "Other", "MATLAB", "C++")
+            ),
+            Platform = forcats::fct_reorder(Platform, -Total),
+            RPython = factor(
+                RPython,
+                levels = c("R", "Both", "Python", "Other")
+            )
+        )
+
+    plot_labels <- plot_data %>%
+        dplyr::select(-RPython, -Count) %>%
+        dplyr::distinct() %>%
+        dplyr::mutate(
+            Percent = Total / sum(Total) * 100,
+            Label   = glue::glue(
+                "**{Platform}**<br/>{Total}<br/>{round(Percent, 1)}%"
+            )
+        )
+
+    ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(x = Count, y = forcats::fct_rev(Platform))
+    ) +
+        ggplot2::geom_col(ggplot2::aes(fill = RPython)) +
+        ggtext::geom_richtext(
+            data = plot_labels,
+            ggplot2::aes(x = Total, label = Label),
+            hjust = 0, nudge_x = 5,
+            fill = NA, label.colour = NA,
+            lineheight = 1.2
+        ) +
+        ggplot2::scale_x_continuous(expand = c(0, 0)) +
+        ggplot2::scale_y_discrete(expand = c(0, 0)) +
+        ggplot2::scale_fill_discrete(name = "R/Python") +
+        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.1)) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.title = ggplot2::element_blank(),
+            axis.text  = ggplot2::element_blank(),
+            panel.grid = ggplot2::element_blank()
+        )
+}
+
+#' Plot licenses bar
+#'
+#' Plot a bar chart showing how many tools use different licenses
+#'
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot object
+plot_licenses_bar <- function(tools) {
+
+    plot_data <- tools %>%
+        dplyr::mutate(
+            RPython = dplyr::case_when(
+                PlatformR & PlatformPy ~ "Both",
+                PlatformR              ~ "R",
+                PlatformPy             ~ "Python",
+                TRUE                   ~ "Other"
+            ),
+            License = dplyr::case_when(
+                LicenseGPL      ~ "GPL",
+                LicenseMIT      ~ "MIT",
+                LicenseBSD      ~ "BSD",
+                LicenseApache   ~ "Apache",
+                LicenseArtistic ~ "Artistic",
+                LicenseOther    ~ "Other",
+                TRUE            ~ "None"
+            )
+        ) %>%
+        dplyr::select(Tool, License, RPython) %>%
+        dplyr::group_by(RPython, License) %>%
+        dplyr::count(name = "Count") %>%
+        dplyr::group_by(License) %>%
+        dplyr::mutate(Total = sum(Count)) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(
+            License = factor(
+                License,
+                levels = c(
+                    "GPL", "MIT", "BSD", "Apache", "Artistic", "Other", "None"
+                )
+            ),
+            RPython = factor(
+                RPython,
+                levels = c("R", "Both", "Python", "Other")
+            )
+        )
+
+    plot_labels <- plot_data %>%
+        dplyr::select(-RPython, -Count) %>%
+        dplyr::distinct() %>%
+        dplyr::mutate(
+            Percent = Total / sum(Total) * 100,
+            Label   = glue::glue(
+                "**{License}**<br/>{Total}<br/>{round(Percent, 1)}%"
+            )
+        )
+
+    ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(x = Count, y = forcats::fct_rev(License))
+    ) +
+        ggplot2::geom_col(ggplot2::aes(fill = RPython)) +
+        ggtext::geom_richtext(
+            data = plot_labels,
+            ggplot2::aes(x = Total, label = Label),
+            hjust = 0, nudge_x = 5,
+            fill = NA, label.colour = NA,
+            lineheight = 1.2
+        ) +
+        ggplot2::scale_x_continuous(expand = c(0, 0)) +
+        ggplot2::scale_y_discrete(expand = c(0, 0)) +
+        ggplot2::scale_fill_discrete(name = "R/Python") +
+        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.1)) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.title = ggplot2::element_blank(),
+            axis.text  = ggplot2::element_blank(),
+            panel.grid = ggplot2::element_blank()
+        )
+}
+
+#' Plot repositories bar
+#'
+#' Plot a bar chart showing how many tools are in different software
+#' repositories
+#'
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot object
+plot_repositories_bar <- function(tools) {
+
+    plot_data <- tools %>%
+        dplyr::mutate(
+            RPython = dplyr::case_when(
+                PlatformR & PlatformPy ~ "Both",
+                PlatformR              ~ "R",
+                PlatformPy             ~ "Python",
+                TRUE                   ~ "Other"
+            ),
+            Repo = dplyr::case_when(
+                Bioc + CRAN + PyPI > 1 ~ "Multiple",
+                Bioc                   ~ "Bioconductor",
+                CRAN                   ~ "CRAN",
+                PyPI                   ~ "PyPI",
+                TRUE                   ~ "None"
+            )
+        ) %>%
+        dplyr::select(Tool, Repo, RPython) %>%
+        dplyr::group_by(RPython, Repo) %>%
+        dplyr::count(name = "Count") %>%
+        dplyr::group_by(Repo) %>%
+        dplyr::mutate(Total = sum(Count)) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(
+            Repo = factor(
+                Repo,
+                levels = c("PyPI", "Multiple", "Bioconductor", "CRAN", "None")
+            ),
+            RPython = factor(
+                RPython,
+                levels = c("R", "Both", "Python", "Other")
+            )
+        )
+
+    plot_labels <- plot_data %>%
+        dplyr::select(-RPython, -Count) %>%
+        dplyr::distinct() %>%
+        dplyr::mutate(
+            Percent = Total / sum(Total) * 100,
+            Label   = glue::glue(
+                "**{Repo}**<br/>{Total}<br/>{round(Percent, 1)}%"
+            )
+        )
+
+    ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(x = Count, y = forcats::fct_rev(Repo))
+    ) +
+        ggplot2::geom_col(ggplot2::aes(fill = RPython)) +
+        ggtext::geom_richtext(
+            data = plot_labels,
+            ggplot2::aes(x = Total, label = Label),
+            hjust = 0, nudge_x = 5,
+            fill = NA, label.colour = NA,
+            lineheight = 1.2
+        ) +
+        ggplot2::scale_x_continuous(expand = c(0, 0)) +
+        ggplot2::scale_y_discrete(expand = c(0, 0)) +
+        ggplot2::scale_fill_discrete(name = "R/Python") +
+        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.1)) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.title = ggplot2::element_blank(),
+            axis.text  = ggplot2::element_blank(),
+            panel.grid = ggplot2::element_blank()
+        )
+}
+
+#' Plot categories bar
+#'
+#' Plot a bar chart showing how many tools are in different categories
+#'
+#' @param categories_idx data.frame containing categories_idx
+#'
+#' @return ggplot object
+plot_categories_bar <- function(categories_idx) {
+
+    plot_data <- categories_idx %>%
+        dplyr::group_by(Category) %>%
+        dplyr::count(name = "Count") %>%
+        dplyr::ungroup() %>%
+        dplyr::arrange(Count) %>%
+        dplyr::mutate(
+            Category = stringr::str_replace_all(
+                Category, "([[:upper:]])", " \\1"
+            ),
+            Category = stringr::str_trim(Category),
+            Category = dplyr::if_else(
+                Category == "U M Is", "UMIs", Category
+            ),
+            Category = factor(Category, levels = Category),
+            Percent  = Count / length(unique(categories_idx$Tool)) * 100,
+            Label = glue::glue("**{Category}** {Count}, {round(Percent, 1)}%")
+        )
+
+    ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(x = Count, y = Category)
+    ) +
+        ggplot2::geom_col() +
+        ggtext::geom_richtext(
+            ggplot2::aes(
+                label   = Label,
+                hjust   = dplyr::if_else(Count == max(Count), 1, 0),
+                colour  = Count == max(Count)
+            ),
+            fill = NA, label.colour = NA,
+            lineheight = 1.2
+        ) +
+        ggplot2::scale_x_continuous(expand = c(0, 0)) +
+        ggplot2::scale_y_discrete(expand = c(0, 0)) +
+        ggplot2::scale_colour_manual(
+            values = c("black", "white"),
+            guide = "none"
+        ) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.title = ggplot2::element_blank(),
+            axis.text  = ggplot2::element_blank(),
+            panel.grid = ggplot2::element_blank()
+        )
+}

@@ -181,6 +181,22 @@ list(
         )
     ),
     tar_target(
+        platforms_bar_plot,
+        plot_platforms_bar(tools)
+    ),
+    tar_target(
+        licenses_bar_plot,
+        plot_licenses_bar(tools)
+    ),
+    tar_target(
+        repositories_bar_plot,
+        plot_repositories_bar(tools)
+    ),
+    tar_target(
+        categories_bar_plot,
+        plot_categories_bar(categories_idx)
+    ),
+    tar_target(
         mfa_variables,
         get_mfa_variables()
     ),
