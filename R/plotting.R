@@ -1225,3 +1225,100 @@ plot_categories_bar <- function(categories_idx) {
             panel.grid = ggplot2::element_blank()
         )
 }
+
+#' Plot words trend
+#'
+#' Plot the trend in word usage in abstracts over time
+#'
+#' @param references data.frame containing references data
+#' @param sc_stopwords data.frame with column containing single-cell stopwords
+#' @param top_words vector of top words to highlight
+#'
+#' @return ggplot object
+plot_words_trend <- function(references, sc_stopwords, top_words) {
+
+    ref_dates <- references %>%
+        dplyr::filter(!is.na(Abstract)) %>%
+        dplyr::arrange(Date) %>%
+        dplyr::group_by(Date) %>%
+        dplyr::count(name = "Count") %>%
+        dplyr::ungroup() %>%
+        tidyr::complete(
+            Date = tidyr::full_seq(Date, 1),
+            fill = list(Count = 0)
+        ) %>%
+        dplyr::mutate(RefTotal = cumsum(Count)) %>%
+        dplyr::select(Date, RefTotal)
+
+    word_dates <- references %>%
+        dplyr::select(DOI, Date, Abstract) %>%
+        dplyr::filter(!is.na(Abstract)) %>%
+        dplyr::mutate(
+            Abstract = stringr::str_remove_all(Abstract, "\\S*https?:\\S*"),
+            Abstract = stringr::str_remove_all(
+                Abstract,
+                "\\b-?[0-9]\\d*(\\.\\d+)?\\b"
+            )
+        ) %>%
+        tidytext::unnest_tokens(Word, Abstract) %>%
+        dplyr::anti_join(tidytext::stop_words, by = c("Word" = "word")) %>%
+        dplyr::anti_join(sc_stopwords, by = c("Word" = "word")) %>%
+        dplyr::distinct() %>%
+        dplyr::group_by(Date, Word) %>%
+        dplyr::count(name = "Count") %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(MaxDate = max(Date)) %>%
+        dplyr::group_by(Word) %>%
+        dplyr::filter(sum(Count) > 10) %>%
+        tidyr::complete(
+            Date = seq.Date(min(Date), unique(MaxDate), by = "day"),
+            fill = list(Count = 0)
+        ) %>%
+        dplyr::select(-MaxDate) %>%
+        dplyr::mutate(Total = cumsum(Count)) %>%
+        dplyr::ungroup() %>%
+        dplyr::left_join(ref_dates, by = "Date") %>%
+        dplyr::mutate(Prop = Total / RefTotal) %>%
+        dplyr::filter(Date >= "2017-01-01") %>%
+        dplyr::group_by(Word) %>%
+        dplyr::mutate(PropChange = Prop - Prop[1]) %>%
+        dplyr::ungroup()
+
+    top_data <- dplyr::filter(word_dates, Word %in% top_words)
+
+    ggplot2::ggplot(
+        word_dates,
+        ggplot2::aes(x = Date, y = PropChange, group = Word)
+    ) +
+        ggplot2::geom_line(colour = "grey60", alpha = 0.5, size = 0.5) +
+        ggplot2::geom_hline(yintercept = 0, colour = "red") +
+        ggplot2::geom_line(
+            data = top_data,
+            ggplot2::aes(colour = Word),
+            size = 1
+        ) +
+        ggrepel::geom_text_repel(
+            data = dplyr::filter(top_data, Date == max(Date)),
+            ggplot2::aes(label = Word, colour = Word),
+            direction = "y",
+            hjust     = 0,
+            nudge_x   = 20
+        ) +
+        ggplot2::scale_x_date(
+            expand = ggplot2::expansion(mult = c(0.01, 0.12)),
+            breaks = seq.Date(
+                lubridate::as_date("2017-01-01"),
+                lubridate::as_date("2021-01-01"),
+                by = "year"
+            ),
+            minor_breaks = seq.Date(
+                lubridate::as_date("2017-06-01"),
+                lubridate::as_date("2021-01-01"),
+                by = "year"
+            )
+        ) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            legend.position = "none"
+        )
+}

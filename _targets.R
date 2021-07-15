@@ -15,6 +15,7 @@ source(here("R", "tools.R"))
 source(here("R", "references.R"))
 source(here("R", "analytics.R"))
 source(here("R", "dependencies.R"))
+source(here("R", "text_analysis.R"))
 source(here("R", "sankey.R"))
 source(here("R", "mfa.R"))
 source(here("R", "plotting.R"))
@@ -293,5 +294,17 @@ list(
     tar_target(
         tools_models_plot,
         plot_tools_models(tools)
+    ),
+    tar_target(
+        sc_stopwords,
+        get_sc_stopwords()
+    ),
+    tar_target(
+        top_words,
+        get_top_words()
+    ),
+    tar_target(
+        word_trends_plot,
+        plot_words_trend(references, sc_stopwords, top_words)
     )
 )
