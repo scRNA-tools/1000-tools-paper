@@ -4,6 +4,7 @@
 
 library(targets)
 library(here)
+library(magrittr)
 
 #==============================================================================#
 # ---- FUNCTIONS ----
@@ -19,6 +20,7 @@ source(here("R", "text_analysis.R"))
 source(here("R", "sankey.R"))
 source(here("R", "mfa.R"))
 source(here("R", "plotting.R"))
+source(here("R", "figures.R"))
 
 #==============================================================================#
 # ---- OPTIONS ----
@@ -306,5 +308,78 @@ list(
     tar_target(
         word_trends_plot,
         plot_words_trend(references, sc_stopwords, top_words)
+    ),
+    tar_target(
+        overview_figure,
+        make_overview_figure(
+            platforms_bar_plot,
+            repositories_bar_plot,
+            licenses_bar_plot,
+            tools_plot,
+            pub_status_plot,
+            categories_bar_plot
+        )
+    ),
+    tar_target(
+        overview_figure_png,
+        ggplot2::ggsave(
+            plot     = overview_figure,
+            filename = here("output", "overview_figure.png"),
+            device   = ragg::agg_png,
+            width    = 20,
+            height   = 14,
+            units    = "cm",
+            res      = 300,
+            scaling  = 0.4,
+            bg       = "white"
+        ),
+        format = "file"
+    ),
+    tar_target(
+        trends_figure,
+        make_trends_figure(
+            platforms_time_plot,
+            category_trend_plot,
+            word_trends_plot
+        )
+    ),
+    tar_target(
+        trends_figure_png,
+        ggplot2::ggsave(
+            plot     = trends_figure,
+            filename = here("output", "trends_figure.png"),
+            device   = ragg::agg_png,
+            width    = 20,
+            height   = 12,
+            units    = "cm",
+            res      = 300,
+            scaling  = 0.4,
+            bg       = "white"
+        ),
+        format = "file"
+    ),
+    tar_target(
+        open_figure,
+        make_open_figure(
+            delay_plot,
+            gh_stats_plot,
+            publications_models_plot,
+            tools_models_plot
+        )
+    ),
+    tar_target(
+        open_figure_png,
+        ggplot2::ggsave(
+            plot     = open_figure,
+            filename = here("output", "open_figure.png"),
+            device   = ragg::agg_png,
+            width    = 20,
+            height   = 16,
+            units    = "cm",
+            res      = 300,
+            scaling  = 0.4,
+            bg       = "white"
+        ),
+        format = "file"
     )
 )

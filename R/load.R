@@ -286,6 +286,6 @@ load_ga_countries <- function(date) {
             Country == "United Kingdom"      ~ "UK",
             Country == "United States"       ~ "USA",
             Country == "U.S. Virgin Islands" ~ "Virgin Islands",
-            TRUE                           ~ Country
+            TRUE                             ~ Country
         ))
 }
