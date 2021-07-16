@@ -56,6 +56,7 @@ get_top_words <- function() {
         "batch",
         "multiple",
         "infer",
-        "heterogeneity"
+        "heterogeneity",
+        "velocity"
     )
 }
