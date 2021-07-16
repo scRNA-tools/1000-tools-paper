@@ -195,15 +195,30 @@ plot_publication_delay <- function(ref_links, references) {
         delays,
         ggplot2::aes(x = PreprintDate, y = Delay, colour = log10(Citations))
     ) +
-        ggplot2::geom_point() +
-        ggplot2::scale_colour_viridis_c(option = "plasma") +
+        ggplot2::geom_point(size = 2, alpha = 0.8) +
+        ggplot2::scale_colour_viridis_c(
+            option = "plasma",
+            name   = "log<sub>10</sub>(Citations)"
+        ) +
+        ggplot2::labs(
+           x = "Preprint date",
+           y = "Days until publication"
+        ) +
+        ggplot2::guides(
+           colour = ggplot2::guide_colourbar(
+               barwidth = 28
+           )
+        ) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             panel.background = ggplot2::element_rect(
                 colour = "grey30",
                 fill   = "NA"
             ),
-            legend.position = "bottom"
+            legend.position  = "bottom",
+            legend.title     = ggtext::element_markdown(
+                size = ggplot2::rel(1.2)
+            )
         )
 
     boxplot <- ggplot2::ggplot(delays, ggplot2::aes(y = Delay)) +
@@ -264,27 +279,28 @@ plot_publication_status <- function(tools) {
         dplyr::summarise(Count = dplyr::n()) %>%
         dplyr::mutate(Prop = Count / sum(Count)) %>%
         dplyr::mutate(
-            PctStr = format(
-                Prop * 100,
-                digits = 1,
-                nsmall = 1
-            ),
-            Label = glue::glue("{PubStatus}\n({Count}, {PctStr}%)")
+            PctStr = format(Prop * 100, digits = 1, nsmall = 1),
+            Label  = glue::glue("**{PubStatus}**<br/>{Count}, {PctStr}%")
         )
 
     ggplot2::ggplot(plot_data, ggplot2::aes(x = PubStatus, y = Count)) +
         ggplot2::geom_col(ggplot2::aes(fill = PubStatus)) +
-        ggplot2::geom_text(
+        ggtext::geom_richtext(
             ggplot2::aes(label = Label),
-            vjust  = 1.5,
-            size   = 5,
-            colour = "white"
+            vjust        = -0.1,
+            size         = 5,
+            fill         = NA,
+            label.colour = NA,
+            lineheight   = 1.2
         ) +
+        ggplot2::scale_y_continuous(expand = c(0, 0)) +
+        ggplot2::expand_limits(y = c(0, max(plot_data$Count) * 1.1)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             legend.position = "none",
             axis.title = ggplot2::element_blank(),
             axis.text  = ggplot2::element_blank(),
+            axis.ticks = ggplot2::element_blank(),
             panel.grid = ggplot2::element_blank()
         )
 }
@@ -322,18 +338,19 @@ plot_gh_stats <- function(gh_repos) {
     ggplot2::ggplot(stats, ggplot2::aes(x = "A", y = forcats::fct_rev(Stat))) +
         ggplot2::geom_text(
             ggplot2::aes(label = ValueLabel),
-            size    = 20,
+            size    = 14,
             colour  = "dodgerblue",
             hjust   = 1,
             nudge_x = -0.01
         ) +
         ggplot2::geom_text(
             ggplot2::aes(label = Stat),
-            size    = 20,
+            size    = 14,
             colour  = "black",
             hjust   = 0,
             nudge_x = 0.01
         ) +
+        ggplot2::expand_limits(y = c(-2, 8)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             axis.title = ggplot2::element_blank(),
@@ -802,6 +819,7 @@ plot_publications_models <- function(references, ref_links) {
         ggplot2::theme_minimal() +
         ggplot2::theme(
             axis.title.y    = ggplot2::element_blank(),
+            axis.text       = ggplot2::element_text(size = 14),
             legend.position = "bottom"
         )
 }
@@ -920,12 +938,14 @@ plot_tools_models <- function(tools) {
             fill     = "white"
         ) +
         ggplot2::scale_y_discrete(labels = term_labels) +
+        ggplot2::scale_colour_discrete(labels = c("Total Altmetric", "Total citations", "GitHub popularity")) +
         ggplot2::scale_shape_manual(values = c(21, 16)) +
         ggplot2::scale_size_manual(values = c(2.2, 3)) +
         ggplot2::labs(x = "Coefficient") +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             axis.title.y    = ggplot2::element_blank(),
+            axis.text       = ggplot2::element_text(size = 14),
             legend.position = "bottom"
         )
 }
@@ -1005,9 +1025,11 @@ plot_platforms_bar <- function(tools) {
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::scale_y_discrete(expand = c(0, 0)) +
         ggplot2::scale_fill_discrete(name = "R/Python") +
-        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.1)) +
+        ggplot2::labs(title = "Platforms") +
+        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.2)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
+            plot.title = ggplot2::element_text(size = 24),
             axis.title = ggplot2::element_blank(),
             axis.text  = ggplot2::element_blank(),
             panel.grid = ggplot2::element_blank()
@@ -1085,9 +1107,11 @@ plot_licenses_bar <- function(tools) {
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::scale_y_discrete(expand = c(0, 0)) +
         ggplot2::scale_fill_discrete(name = "R/Python") +
-        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.1)) +
+        ggplot2::labs(title = "Repositories") +
+        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.2)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
+            plot.title = ggplot2::element_text(size = 24),
             axis.title = ggplot2::element_blank(),
             axis.text  = ggplot2::element_blank(),
             panel.grid = ggplot2::element_blank()
@@ -1162,9 +1186,11 @@ plot_repositories_bar <- function(tools) {
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::scale_y_discrete(expand = c(0, 0)) +
         ggplot2::scale_fill_discrete(name = "R/Python") +
-        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.1)) +
+        ggplot2::labs(title = "Licenses") +
+        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.2)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
+            plot.title = ggplot2::element_text(size = 24),
             axis.title = ggplot2::element_blank(),
             axis.text  = ggplot2::element_blank(),
             panel.grid = ggplot2::element_blank()
@@ -1175,7 +1201,7 @@ plot_repositories_bar <- function(tools) {
 #'
 #' Plot a bar chart showing how many tools are in different categories
 #'
-#' @param categories_idx data.frame containing categories_idx
+#' @param categories_idx data.frame containing categories index
 #'
 #' @return ggplot object
 plot_categories_bar <- function(categories_idx) {
@@ -1190,12 +1216,15 @@ plot_categories_bar <- function(categories_idx) {
                 Category, "([[:upper:]])", " \\1"
             ),
             Category = stringr::str_trim(Category),
-            Category = dplyr::if_else(
-                Category == "U M Is", "UMIs", Category
+            Category = stringr::str_to_sentence(Category),
+            Category = dplyr::case_when(
+                Category == "U m is"                   ~ "UMIs",
+                Category == "Dimensionality reduction" ~ "Dim. reduction",
+                TRUE                                   ~ Category
             ),
             Category = factor(Category, levels = Category),
             Percent  = Count / length(unique(categories_idx$Tool)) * 100,
-            Label = glue::glue("**{Category}** {Count}, {round(Percent, 1)}%")
+            Label = glue::glue("**{Category}**<br/>{Count}, {round(Percent, 1)}%")
         )
 
     ggplot2::ggplot(
@@ -1214,6 +1243,7 @@ plot_categories_bar <- function(categories_idx) {
         ) +
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::scale_y_discrete(expand = c(0, 0)) +
+        # ggplot2::expand_limits(x = c(0, max(plot_data$Count) * 1.1)) +
         ggplot2::scale_colour_manual(
             values = c("black", "white"),
             guide = "none"
