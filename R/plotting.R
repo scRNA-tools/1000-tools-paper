@@ -1109,7 +1109,7 @@ plot_licenses_bar <- function(tools) {
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::scale_y_discrete(expand = c(0, 0)) +
         ggplot2::scale_fill_discrete(name = "R/Python") +
-        ggplot2::labs(title = "Repositories") +
+        ggplot2::labs(title = "Licenses") +
         ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.2)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
@@ -1189,7 +1189,7 @@ plot_repositories_bar <- function(tools) {
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::scale_y_discrete(expand = c(0, 0)) +
         ggplot2::scale_fill_discrete(name = "R/Python") +
-        ggplot2::labs(title = "Licenses") +
+        ggplot2::labs(title = "Repositories") +
         ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.2)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
