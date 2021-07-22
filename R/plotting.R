@@ -1004,9 +1004,10 @@ plot_platforms_bar <- function(tools) {
         dplyr::select(-RPython, -Count) %>%
         dplyr::distinct() %>%
         dplyr::mutate(
-            Percent = Total / sum(Total) * 100,
+            Percent = Total / nrow(tools) * 100,
+            PctStr  = format(Percent, digits = 1, nsmall = 1),
             Label   = glue::glue(
-                "**{Platform}**<br/>{Total}<br/>{round(Percent, 1)}%"
+                "**{Platform}**<br/>{Total}<br/>{PctStr}%"
             )
         )
 
@@ -1086,9 +1087,10 @@ plot_licenses_bar <- function(tools) {
         dplyr::select(-RPython, -Count) %>%
         dplyr::distinct() %>%
         dplyr::mutate(
-            Percent = Total / sum(Total) * 100,
+            Percent = Total / nrow(tools) * 100,
+            PctStr  = format(Percent, digits = 1, nsmall = 1),
             Label   = glue::glue(
-                "**{License}**<br/>{Total}<br/>{round(Percent, 1)}%"
+                "**{License}**<br/>{Total}<br/>{PctStr}%"
             )
         )
 
@@ -1165,9 +1167,10 @@ plot_repositories_bar <- function(tools) {
         dplyr::select(-RPython, -Count) %>%
         dplyr::distinct() %>%
         dplyr::mutate(
-            Percent = Total / sum(Total) * 100,
+            Percent = Total / nrow(tools) * 100,
+            PctStr  = format(Percent, digits = 1, nsmall = 1),
             Label   = glue::glue(
-                "**{Repo}**<br/>{Total}<br/>{round(Percent, 1)}%"
+                "**{Repo}**<br/>{Total}<br/>{PctStr}%"
             )
         )
 
