@@ -59,7 +59,7 @@ make_overview_figure <- function(platforms_bar_plot, repositories_bar_plot,
 #'
 #' @return assembled ggplot object
 make_trends_figure <- function(platforms_time_plot, category_trend_plot,
-                             word_trends_plot) {
+                               word_trends_plot) {
     patchwork::wrap_plots(
         A = platforms_time_plot,
         B = category_trend_plot,

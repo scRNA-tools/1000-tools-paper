@@ -147,16 +147,17 @@ plot_platforms_over_time <- function(tools) {
         ggplot2::geom_text(
             data = dplyr::filter(platform_dates, Date == dplyr::last(Date)),
             ggplot2::aes(label = Platform),
-            hjust = -0.1
+            hjust = -0.1,
+            size  = 4
         ) +
         ggplot2::scale_x_date(
-            expand = ggplot2::expansion(mult = c(0.01, 0.1))
+            expand = ggplot2::expansion(mult = c(0.01, 0.12))
         ) +
         ggplot2::labs(
             x = "Date",
             y = "Percentage of tools in database"
         ) +
-        ggplot2::theme_minimal() +
+        ggplot2::theme_minimal(base_size = 16) +
         ggplot2::theme(
             legend.position = "none"
         )
@@ -553,12 +554,12 @@ plot_category_prop_trend <- function(categories, tools) {
     ) +
         ggplot2::geom_hline(yintercept = 0, colour = "red") +
         ggplot2::geom_point() +
-        ggrepel::geom_text_repel() +
+        ggrepel::geom_text_repel(size = 3) +
         ggplot2::labs(
             x = "Proportion of tools in database",
             y = "Trend in proportion over time"
         ) +
-        ggplot2::theme_minimal() +
+        ggplot2::theme_minimal(base_size = 16) +
         ggplot2::theme(legend.position = "none")
 }
 
@@ -1340,7 +1341,8 @@ plot_words_trend <- function(references, sc_stopwords, top_words) {
             ggplot2::aes(label = Word, colour = Word),
             direction = "y",
             hjust     = 0,
-            nudge_x   = 20
+            nudge_x   = 20,
+            size      = 4
         ) +
         ggplot2::scale_x_date(
             expand = ggplot2::expansion(mult = c(0.01, 0.12)),
@@ -1355,7 +1357,10 @@ plot_words_trend <- function(references, sc_stopwords, top_words) {
                 by = "year"
             )
         ) +
-        ggplot2::theme_minimal() +
+        ggplot2::scale_y_continuous(
+            expand = ggplot2::expansion(mult = c(0.01, 0.15))
+        ) +
+        ggplot2::theme_minimal(base_size = 16) +
         ggplot2::theme(
             legend.position = "none"
         )
