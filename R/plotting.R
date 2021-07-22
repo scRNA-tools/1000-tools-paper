@@ -42,7 +42,7 @@ plot_tools_over_time <- function(tools) {
         ggplot2::labs(
             y = "Number of tools in database"
         ) +
-        ggplot2::theme_minimal()
+        ggplot2::theme_minimal(base_size = 16)
 }
 
 #' Annotate publication date
@@ -294,7 +294,7 @@ plot_publication_status <- function(tools) {
             lineheight   = 1.2
         ) +
         ggplot2::scale_y_continuous(expand = c(0, 0)) +
-        ggplot2::expand_limits(y = c(0, max(plot_data$Count) * 1.1)) +
+        ggplot2::expand_limits(y = c(0, max(plot_data$Count) * 1.15)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             legend.position = "none",
@@ -1021,13 +1021,14 @@ plot_platforms_bar <- function(tools) {
             ggplot2::aes(x = Total, label = Label),
             hjust = 0, nudge_x = 5,
             fill = NA, label.colour = NA,
-            lineheight = 1.2
+            lineheight = 1.2,
+            size = 5.5
         ) +
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::scale_y_discrete(expand = c(0, 0)) +
         ggplot2::scale_fill_discrete(name = "R/Python") +
         ggplot2::labs(title = "Platforms") +
-        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.2)) +
+        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.25)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             plot.title = ggplot2::element_text(size = 24),
@@ -1104,7 +1105,8 @@ plot_licenses_bar <- function(tools) {
             ggplot2::aes(x = Total, label = Label),
             hjust = 0, nudge_x = 5,
             fill = NA, label.colour = NA,
-            lineheight = 1.2
+            lineheight = 1.2,
+            size = 4
         ) +
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::scale_y_discrete(expand = c(0, 0)) +
@@ -1184,13 +1186,14 @@ plot_repositories_bar <- function(tools) {
             ggplot2::aes(x = Total, label = Label),
             hjust = 0, nudge_x = 5,
             fill = NA, label.colour = NA,
-            lineheight = 1.2
+            lineheight = 1.2,
+            size = 5.5
         ) +
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::scale_y_discrete(expand = c(0, 0)) +
         ggplot2::scale_fill_discrete(name = "R/Python") +
         ggplot2::labs(title = "Repositories") +
-        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.2)) +
+        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.25)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             plot.title = ggplot2::element_text(size = 24),
@@ -1222,12 +1225,13 @@ plot_categories_bar <- function(categories_idx) {
             Category = stringr::str_to_sentence(Category),
             Category = dplyr::case_when(
                 Category == "U m is"                   ~ "UMIs",
-                Category == "Dimensionality reduction" ~ "Dim. reduction",
+                Category == "Dimensionality reduction" ~ "Dim. red.",
+                Category == "Differential expression"  ~ "Diff. expression",
                 TRUE                                   ~ Category
             ),
             Category = factor(Category, levels = Category),
             Percent  = Count / length(unique(categories_idx$Tool)) * 100,
-            Label = glue::glue("**{Category}**<br/>{Count}, {round(Percent, 1)}%")
+            Label = glue::glue("**{Category}** {Count}, {round(Percent, 1)}%")
         )
 
     ggplot2::ggplot(
@@ -1242,11 +1246,12 @@ plot_categories_bar <- function(categories_idx) {
                 colour  = Count == max(Count)
             ),
             fill = NA, label.colour = NA,
-            lineheight = 1.2
+            lineheight = 1.2,
+            size = 4.5
         ) +
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::scale_y_discrete(expand = c(0, 0)) +
-        # ggplot2::expand_limits(x = c(0, max(plot_data$Count) * 1.1)) +
+        ggplot2::expand_limits(x = c(0, max(plot_data$Count) * 1.4)) +
         ggplot2::scale_colour_manual(
             values = c("black", "white"),
             guide = "none"
