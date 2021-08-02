@@ -165,8 +165,9 @@ plot_platforms_over_time <- function(tools) {
 
 #' Plot publication delay
 #'
-#' Create a raincloud plot showing the number of days between preprints and
-#' linked publications
+#' Create a scatter plot of days until publication against preprint date for
+#' papers with a linked preprint. Right side shows boxplot and density plot of
+#' publication delay.
 #'
 #' @param ref_links data.frame containing reference links
 #' @param references data.frame containing references data
@@ -197,6 +198,7 @@ plot_publication_delay <- function(ref_links, references) {
         ggplot2::aes(x = PreprintDate, y = Delay, colour = log10(Citations))
     ) +
         ggplot2::geom_point(size = 2, alpha = 0.8) +
+        ggplot2::scale_y_continuous(breaks = seq(0, 1500, 250)) +
         ggplot2::scale_colour_viridis_c(
             option = "plasma",
             name   = "log<sub>10</sub>(Citations)"
@@ -207,10 +209,10 @@ plot_publication_delay <- function(ref_links, references) {
         ) +
         ggplot2::guides(
            colour = ggplot2::guide_colourbar(
-               barwidth = 28
+               barwidth = 20
            )
         ) +
-        ggplot2::theme_minimal() +
+        ggplot2::theme_minimal(base_size = 16) +
         ggplot2::theme(
             panel.background = ggplot2::element_rect(
                 colour = "grey30",
@@ -242,11 +244,14 @@ plot_publication_delay <- function(ref_links, references) {
             axis.ticks = ggplot2::element_blank()
         )
 
-    patchwork::wrap_plots(
+    cowplot::plot_grid(
         scatter,
         boxplot,
         density,
-        widths = c(4, 0.5, 1)
+        rel_widths = c(4, 0.5, 1),
+        nrow = 1,
+        align = "h",
+        axis = c("tb")
     )
 }
 
@@ -339,14 +344,14 @@ plot_gh_stats <- function(gh_repos) {
     ggplot2::ggplot(stats, ggplot2::aes(x = "A", y = forcats::fct_rev(Stat))) +
         ggplot2::geom_text(
             ggplot2::aes(label = ValueLabel),
-            size    = 14,
+            size    = 12,
             colour  = "dodgerblue",
             hjust   = 1,
             nudge_x = -0.01
         ) +
         ggplot2::geom_text(
             ggplot2::aes(label = Stat),
-            size    = 14,
+            size    = 12,
             colour  = "black",
             hjust   = 0,
             nudge_x = 0.01
@@ -819,9 +824,14 @@ plot_publications_models <- function(references, ref_links) {
         ggplot2::labs(x = "Coefficient") +
         ggplot2::theme_minimal() +
         ggplot2::theme(
+            axis.title.x    = ggplot2::element_text(size = 12),
             axis.title.y    = ggplot2::element_blank(),
-            axis.text       = ggplot2::element_text(size = 14),
-            legend.position = "bottom"
+            axis.text       = ggplot2::element_text(size = 12),
+            legend.position = "bottom",
+            legend.title    = ggplot2::element_text(size = 12),
+            legend.text     = ggplot2::element_text(size = 12),
+            legend.box      = "vertical",
+            legend.margin   = ggplot2::margin(t = -8)
         )
 }
 
@@ -945,9 +955,14 @@ plot_tools_models <- function(tools) {
         ggplot2::labs(x = "Coefficient") +
         ggplot2::theme_minimal() +
         ggplot2::theme(
+            axis.title.x    = ggplot2::element_text(size = 12),
             axis.title.y    = ggplot2::element_blank(),
-            axis.text       = ggplot2::element_text(size = 14),
-            legend.position = "bottom"
+            axis.text       = ggplot2::element_text(size = 12),
+            legend.position = "bottom",
+            legend.title    = ggplot2::element_text(size = 12),
+            legend.text     = ggplot2::element_text(size = 12),
+            legend.box      = "vertical",
+            legend.margin   = ggplot2::margin(t = -8)
         )
 }
 

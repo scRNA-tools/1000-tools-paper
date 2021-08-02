@@ -91,7 +91,7 @@ make_open_figure <- function(delay_plot, gh_stats_plot,
             delay_plot,
             gh_stats_plot,
             nrow       = 1,
-            rel_widths = c(1, 0.5),
+            rel_widths = c(1, 0.6),
             labels     = c("A", "B")
         ),
         cowplot::plot_grid(

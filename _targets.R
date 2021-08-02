@@ -377,7 +377,7 @@ list(
             height   = 16,
             units    = "cm",
             res      = 300,
-            scaling  = 0.4,
+            scaling  = 0.5,
             bg       = "white"
         ),
         format = "file"
