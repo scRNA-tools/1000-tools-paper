@@ -33,7 +33,7 @@ GARGLE_EMAIL=your@email.com
 ### johnnydep
 
 Package dependencies for PyPI tools are retrieved using the **johnnydep** tool (https://pypi.org/project/johnnydep/).
-For these stages to work you must have **johnndep** installed.
+For these stages to work you must have **johnnydep** installed.
 The easiest way to do that is using **pip** or **conda**:
 
 ```bash
@@ -51,3 +51,10 @@ which johnnydep
 ```
 JOHNNYDEP_PATH=/path/to/your/johnnydep
 ```
+
+### Fonts
+
+To make sure fonts used in plots are available follow these steps:
+
+1. Download and install the [Noto Sans](https://fonts.google.com/specimen/Noto+Sans) font from Google fonts
+2. Import fonts into R by running `extrafont::font_import()`

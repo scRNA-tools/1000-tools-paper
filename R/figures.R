@@ -14,6 +14,9 @@ make_overview_figure <- function(platforms_bar_plot, repositories_bar_plot,
                                  licenses_bar_plot, tools_plot,
                                  pub_status_plot, categories_bar_plot) {
 
+    # Required because of some interaction between {ggtext} and {cowplot}
+    extrafont::loadfonts(quiet = TRUE)
+
     bars <- patchwork::wrap_plots(
         platforms_bar_plot,
         repositories_bar_plot,
@@ -60,6 +63,9 @@ make_overview_figure <- function(platforms_bar_plot, repositories_bar_plot,
 #' @return assembled ggplot object
 make_trends_figure <- function(platforms_time_plot, category_trend_plot,
                                word_trends_plot) {
+
+    extrafont::loadfonts(quiet = TRUE)
+
     patchwork::wrap_plots(
         A = platforms_time_plot,
         B = category_trend_plot,
@@ -86,6 +92,9 @@ make_trends_figure <- function(platforms_time_plot, category_trend_plot,
 #' @return assembled ggplot object
 make_open_figure <- function(delay_plot, gh_stats_plot,
                              publications_models_plot, tools_models_plot) {
+
+    extrafont::loadfonts(quiet = TRUE)
+
     cowplot::plot_grid(
         cowplot::plot_grid(
             delay_plot,

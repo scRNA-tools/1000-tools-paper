@@ -38,11 +38,11 @@ plot_tools_over_time <- function(tools) {
         ggplot2::aes(x = .data$Date, y = .data$Total)
     ) +
         annotate_pub_date() +
-        ggplot2::geom_line(size = 1) +
+        ggplot2::geom_line(size = 2, colour = "#984ea3") +
         ggplot2::labs(
             y = "Number of tools in database"
         ) +
-        ggplot2::theme_minimal(base_size = 16)
+        theme_1000(base_size = 16)
 }
 
 #' Annotate publication date
@@ -56,17 +56,20 @@ annotate_pub_date <- function() {
     list(
         ggplot2::geom_vline(
             xintercept = lubridate::ymd("2018-06-25"),
-            colour = "red"
+            size   = 1,
+            colour = "#f781bf"
         ),
         ggplot2::annotate(
             "text",
-            x = lubridate::ymd("2018-06-06"),
-            y = Inf,
-            label = "scRNA-tools publication",
-            angle = 90,
-            hjust = 1.1,
-            vjust = -0.5,
-            colour = "red"
+            x          = lubridate::ymd("2018-06-06"),
+            y          = Inf,
+            label      = "scRNA-tools publication",
+            size       = 5,
+            angle      = 90,
+            hjust      = 1.1,
+            vjust      = -0.5,
+            colour     = "#f781bf",
+            family     = "Noto Sans"
         )
     )
 }
@@ -141,26 +144,121 @@ plot_platforms_over_time <- function(tools) {
         platform_dates,
         ggplot2::aes(x = Date, y = Prop, colour = Platform)
     ) +
+        add_date_gridlines(platform_dates) +
+        add_y_gridlines(
+            ymin = 0, ymax = 0.8, ystep = 0.2,
+            xmin = min(platform_dates$Date), xmax = max(platform_dates$Date)
+        ) +
+        ggplot2::geom_vline(
+            xintercept = max(platform_dates$Date),
+            colour = "grey60"
+        ) +
         annotate_pub_date() +
         ggplot2::geom_line(size = 1) +
-        ggplot2::scale_y_continuous(labels = scales::percent) +
-        ggplot2::geom_text(
+        ggrepel::geom_text_repel(
             data = dplyr::filter(platform_dates, Date == dplyr::last(Date)),
             ggplot2::aes(label = Platform),
-            hjust = -0.1,
-            size  = 4
+            hjust             = 0,
+            xlim              = max(platform_dates$Date) + 30,
+            size              = 4,
+            family            = "Noto Sans",
+            segment.size      = 0.7,
+            segment.alpha     = 0.5,
+            segment.linetype  = "dotted",
+            box.padding       = 0.4,
+            segment.curvature = -0.1,
+            segment.ncp       = 3,
+            segment.angle     = 20,
+            seed              = 1
         ) +
         ggplot2::scale_x_date(
-            expand = ggplot2::expansion(mult = c(0.01, 0.12))
+            breaks = seq.Date(
+                lubridate::as_date("2017-01-01"),
+                lubridate::as_date("2021-01-01"),
+                by = "year"
+            ),
+            labels = scales::date_format("%Y"),
+            expand = ggplot2::expansion(mult = c(0, 0.15))
         ) +
+        ggplot2::scale_y_continuous(labels = scales::percent) +
+        ggplot2::scale_color_brewer(palette = "Set1") +
         ggplot2::labs(
             x = "Date",
             y = "Percentage of tools in database"
         ) +
-        ggplot2::theme_minimal(base_size = 16) +
+        theme_1000(base_size = 16, grid = "none") +
         ggplot2::theme(
             legend.position = "none"
         )
+}
+
+add_date_gridlines <- function(plot_data, col = "Date", colour = "grey90",
+                               minor = FALSE) {
+
+    gridlines <- get_date_gridlines(plot_data, col)
+
+    geoms <- ggplot2::geom_vline(
+        xintercept = gridlines$major$Date,
+        colour     = colour
+    )
+
+    if (minor) {
+        geoms <- list(
+            geoms,
+            ggplot2::geom_vline(
+                xintercept = gridlines$minor$Date,
+                colour     = colour,
+                size       = ggplot2::rel(0.5)
+            )
+        )
+    }
+
+    return(geoms)
+
+}
+
+add_y_gridlines <- function(ymin, ymax, ystep, xmin, xmax, colour = "grey90") {
+
+    gridlines <- tibble::tibble(
+        xmin = xmin,
+        xmax = xmax,
+        y    = seq(ymin, ymax, ystep)
+    )
+
+    ggplot2::geom_segment(
+        data = gridlines,
+        ggplot2::aes(x = xmin, xend = xmax, y = y, yend = y),
+        inherit.aes = FALSE,
+        colour      = colour
+    )
+
+}
+
+get_date_gridlines <- function(plot_data, col = "Date") {
+
+    min_date <- min(plot_data[[col]])
+    max_date <- max(plot_data[[col]])
+
+    min_year <- lubridate::floor_date(min_date, unit = "year")
+    max_year <- lubridate::ceiling_date(max_date, unit = "year")
+
+    major <- tibble::tibble(
+        Date = c(
+            min_date,
+            seq(min_year, max_year, by = "year"),
+            max_date
+        )
+    ) %>%
+        dplyr::filter(dplyr::between(Date, min_date, max_date))
+
+    minor <- tibble::tibble(
+        Date = c(
+            seq(min_year + 183, max_year, by = "year")
+        )
+    ) %>%
+        dplyr::filter(dplyr::between(Date, min_date, max_date))
+
+    list(major = major, minor = minor)
 }
 
 #' Plot publication delay
@@ -212,12 +310,8 @@ plot_publication_delay <- function(ref_links, references) {
                barwidth = 20
            )
         ) +
-        ggplot2::theme_minimal(base_size = 16) +
+        theme_1000(base_size = 16) +
         ggplot2::theme(
-            panel.background = ggplot2::element_rect(
-                colour = "grey30",
-                fill   = "NA"
-            ),
             legend.position  = "bottom",
             legend.title     = ggtext::element_markdown(
                 size = ggplot2::rel(1.2)
@@ -297,18 +391,11 @@ plot_publication_status <- function(tools) {
             size         = 5,
             fill         = NA,
             label.colour = NA,
-            lineheight   = 1.2
+            lineheight   = 1.2,
+            family       = "Noto Sans"
         ) +
-        ggplot2::scale_y_continuous(expand = c(0, 0)) +
-        ggplot2::expand_limits(y = c(0, max(plot_data$Count) * 1.15)) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(
-            legend.position = "none",
-            axis.title = ggplot2::element_blank(),
-            axis.text  = ggplot2::element_blank(),
-            axis.ticks = ggplot2::element_blank(),
-            panel.grid = ggplot2::element_blank()
-        )
+        bar_scales() +
+        theme_1000_bar()
 }
 
 #' Plot GitHub stats
@@ -345,7 +432,7 @@ plot_gh_stats <- function(gh_repos) {
         ggplot2::geom_text(
             ggplot2::aes(label = ValueLabel),
             size    = 12,
-            colour  = "dodgerblue",
+            colour  = "#984ea3",
             hjust   = 1,
             nudge_x = -0.01
         ) +
@@ -559,12 +646,24 @@ plot_category_prop_trend <- function(categories, tools) {
     ) +
         ggplot2::geom_hline(yintercept = 0, colour = "red") +
         ggplot2::geom_point() +
-        ggrepel::geom_text_repel(size = 3) +
+        ggrepel::geom_text_repel(
+            size              = 3,
+            family            = "Noto Sans",
+            segment.size      = 0.7,
+            segment.alpha     = 0.5,
+            segment.linetype  = "dotted",
+            box.padding       = 0.2,
+            segment.curvature = -0.1,
+            segment.ncp       = 3,
+            segment.angle     = 20,
+            seed              = 1
+        ) +
+        ggplot2::scale_color_hue(l = 50) +
         ggplot2::labs(
             x = "Proportion of tools in database",
             y = "Trend in proportion over time"
         ) +
-        ggplot2::theme_minimal(base_size = 16) +
+        theme_1000(base_size = 16) +
         ggplot2::theme(legend.position = "none")
 }
 
@@ -819,17 +918,14 @@ plot_publications_models <- function(references, ref_links) {
             fill     = "white"
         ) +
         ggplot2::scale_y_discrete(labels = term_labels) +
+        ggplot2::scale_colour_brewer(palette = "Set1") +
         ggplot2::scale_shape_manual(values = c(21, 16)) +
         ggplot2::scale_size_manual(values = c(2.2, 3)) +
         ggplot2::labs(x = "Coefficient") +
-        ggplot2::theme_minimal() +
+        theme_1000(base_size = 14) +
         ggplot2::theme(
-            axis.title.x    = ggplot2::element_text(size = 12),
             axis.title.y    = ggplot2::element_blank(),
-            axis.text       = ggplot2::element_text(size = 12),
             legend.position = "bottom",
-            legend.title    = ggplot2::element_text(size = 12),
-            legend.text     = ggplot2::element_text(size = 12),
             legend.box      = "vertical",
             legend.margin   = ggplot2::margin(t = -8)
         )
@@ -949,18 +1045,19 @@ plot_tools_models <- function(tools) {
             fill     = "white"
         ) +
         ggplot2::scale_y_discrete(labels = term_labels) +
-        ggplot2::scale_colour_discrete(labels = c("Total Altmetric", "Total citations", "GitHub popularity")) +
+        ggplot2::scale_colour_brewer(
+            palette = "Set1",
+            labels = c(
+                "Total Altmetric", "Total citations", "GitHub popularity"
+            )
+        ) +
         ggplot2::scale_shape_manual(values = c(21, 16)) +
         ggplot2::scale_size_manual(values = c(2.2, 3)) +
         ggplot2::labs(x = "Coefficient") +
-        ggplot2::theme_minimal() +
+        theme_1000(base_size = 14) +
         ggplot2::theme(
-            axis.title.x    = ggplot2::element_text(size = 12),
             axis.title.y    = ggplot2::element_blank(),
-            axis.text       = ggplot2::element_text(size = 12),
             legend.position = "bottom",
-            legend.title    = ggplot2::element_text(size = 12),
-            legend.text     = ggplot2::element_text(size = 12),
             legend.box      = "vertical",
             legend.margin   = ggplot2::margin(t = -8)
         )
@@ -1035,23 +1132,17 @@ plot_platforms_bar <- function(tools) {
         ggtext::geom_richtext(
             data = plot_labels,
             ggplot2::aes(x = Total, label = Label),
-            hjust = 0, nudge_x = 5,
-            fill = NA, label.colour = NA,
-            lineheight = 1.2,
-            size = 5.5
+            hjust        = 0,
+            nudge_x      = 5,
+            fill         = NA,
+            label.colour = NA,
+            lineheight   = 1.2,
+            size         = 5.5,
+            family       = "Noto Sans"
         ) +
-        ggplot2::scale_x_continuous(expand = c(0, 0)) +
-        ggplot2::scale_y_discrete(expand = c(0, 0)) +
-        ggplot2::scale_fill_discrete(name = "R/Python") +
-        ggplot2::labs(title = "Platforms") +
-        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.25)) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(
-            plot.title = ggplot2::element_text(size = 24),
-            axis.title = ggplot2::element_blank(),
-            axis.text  = ggplot2::element_blank(),
-            panel.grid = ggplot2::element_blank()
-        )
+        bar_scales(direction = "h", expansion_mult = 0.22) +
+        ggplot2::labs(title = "Platforms", fill = "R/Python") +
+        theme_1000_bar(direction = "h", base_size = 16)
 }
 
 #' Plot licenses bar
@@ -1119,23 +1210,17 @@ plot_licenses_bar <- function(tools) {
         ggtext::geom_richtext(
             data = plot_labels,
             ggplot2::aes(x = Total, label = Label),
-            hjust = 0, nudge_x = 5,
-            fill = NA, label.colour = NA,
-            lineheight = 1.2,
-            size = 4
+            hjust        = 0,
+            nudge_x      = 5,
+            fill         = NA,
+            label.colour = NA,
+            lineheight   = 1.2,
+            size         = 4,
+            family       = "Noto Sans"
         ) +
-        ggplot2::scale_x_continuous(expand = c(0, 0)) +
-        ggplot2::scale_y_discrete(expand = c(0, 0)) +
-        ggplot2::scale_fill_discrete(name = "R/Python") +
-        ggplot2::labs(title = "Licenses") +
-        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.2)) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(
-            plot.title = ggplot2::element_text(size = 24),
-            axis.title = ggplot2::element_blank(),
-            axis.text  = ggplot2::element_blank(),
-            panel.grid = ggplot2::element_blank()
-        )
+        bar_scales(direction = "h", expansion_mult = 0.22) +
+        ggplot2::labs(title = "Licenses", fill = "R/Python") +
+        theme_1000_bar(direction = "h", base_size = 16)
 }
 
 #' Plot repositories bar
@@ -1200,23 +1285,17 @@ plot_repositories_bar <- function(tools) {
         ggtext::geom_richtext(
             data = plot_labels,
             ggplot2::aes(x = Total, label = Label),
-            hjust = 0, nudge_x = 5,
-            fill = NA, label.colour = NA,
-            lineheight = 1.2,
-            size = 5.5
+            hjust        = 0,
+            nudge_x      = 5,
+            fill         = NA,
+            label.colour = NA,
+            lineheight   = 1.2,
+            size         = 5.5,
+            family       = "Noto Sans"
         ) +
-        ggplot2::scale_x_continuous(expand = c(0, 0)) +
-        ggplot2::scale_y_discrete(expand = c(0, 0)) +
-        ggplot2::scale_fill_discrete(name = "R/Python") +
-        ggplot2::labs(title = "Repositories") +
-        ggplot2::expand_limits(x = c(0, max(plot_data$Total) * 1.25)) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(
-            plot.title = ggplot2::element_text(size = 24),
-            axis.title = ggplot2::element_blank(),
-            axis.text  = ggplot2::element_blank(),
-            panel.grid = ggplot2::element_blank()
-        )
+        bar_scales(direction = "h", expansion_mult = 0.22) +
+        ggplot2::labs(title = "Repositories", fill = "R/Python") +
+        theme_1000_bar(direction = "h", base_size = 16)
 }
 
 #' Plot categories bar
@@ -1254,30 +1333,25 @@ plot_categories_bar <- function(categories_idx) {
         plot_data,
         ggplot2::aes(x = Count, y = Category)
     ) +
-        ggplot2::geom_col() +
+        ggplot2::geom_col(fill = "#984ea3") +
         ggtext::geom_richtext(
             ggplot2::aes(
                 label   = Label,
                 hjust   = dplyr::if_else(Count == max(Count), 1, 0),
                 colour  = Count == max(Count)
             ),
-            fill = NA, label.colour = NA,
-            lineheight = 1.2,
-            size = 4.5
+            fill         = NA,
+            label.colour = NA,
+            lineheight   = 1.2,
+            size         = 4.5,
+            family       = "Noto Sans"
         ) +
-        ggplot2::scale_x_continuous(expand = c(0, 0)) +
-        ggplot2::scale_y_discrete(expand = c(0, 0)) +
-        ggplot2::expand_limits(x = c(0, max(plot_data$Count) * 1.4)) +
         ggplot2::scale_colour_manual(
             values = c("black", "white"),
             guide = "none"
         ) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(
-            axis.title = ggplot2::element_blank(),
-            axis.text  = ggplot2::element_blank(),
-            panel.grid = ggplot2::element_blank()
-        )
+        bar_scales(direction = "h", expansion_mult = 0.45) +
+        theme_1000_bar(direction = "h", base_size = 16)
 }
 
 #' Plot words trend
@@ -1344,8 +1418,22 @@ plot_words_trend <- function(references, sc_stopwords, top_words) {
         word_dates,
         ggplot2::aes(x = Date, y = PropChange, group = Word)
     ) +
+        add_date_gridlines(word_dates, minor = TRUE) +
+        add_y_gridlines(
+            ymin = -0.2, ymax = 0.2, ystep = 0.1,
+            xmin = as.Date(-Inf), xmax = max(word_dates$Date)
+        ) +
         ggplot2::geom_line(colour = "grey60", alpha = 0.5, size = 0.5) +
-        ggplot2::geom_hline(yintercept = 0, colour = "red") +
+        ggplot2::annotate(
+            "segment",
+            x = as.Date(-Inf), xend = max(word_dates$Date),
+            y = 0, yend = 0,
+            colour = "red"
+        ) +
+        ggplot2::geom_vline(
+            xintercept = max(word_dates$Date),
+            colour     = "grey60"
+        ) +
         ggplot2::geom_line(
             data = top_data,
             ggplot2::aes(colour = Word),
@@ -1354,28 +1442,32 @@ plot_words_trend <- function(references, sc_stopwords, top_words) {
         ggrepel::geom_text_repel(
             data = dplyr::filter(top_data, Date == max(Date)),
             ggplot2::aes(label = Word, colour = Word),
-            direction = "y",
-            hjust     = 0,
-            nudge_x   = 20,
-            size      = 4
+            direction          = "y",
+            hjust              = 0,
+            xlim = c(max(word_dates$Date) + 30, NA),
+            size               = 3.2,
+            family             = "Noto Sans",
+            min.segment.length = 0,
+            segment.size       = 0.7,
+            segment.alpha      = 0.5,
+            segment.linetype   = "dotted",
+            box.padding        = 0.2,
+            segment.curvature  = -0.1,
+            segment.ncp        = 3,
+            segment.angle      = 20,
+            seed               = 1
         ) +
         ggplot2::scale_x_date(
-            expand = ggplot2::expansion(mult = c(0.01, 0.12)),
+            expand = ggplot2::expansion(mult = c(0.01, 0.1)),
             breaks = seq.Date(
                 lubridate::as_date("2017-01-01"),
                 lubridate::as_date("2021-01-01"),
-                by = "year"
+                by     = "year",
             ),
-            minor_breaks = seq.Date(
-                lubridate::as_date("2017-06-01"),
-                lubridate::as_date("2021-01-01"),
-                by = "year"
-            )
+            labels = scales::date_format("%Y")
         ) +
-        ggplot2::scale_y_continuous(
-            expand = ggplot2::expansion(mult = c(0.01, 0.15))
-        ) +
-        ggplot2::theme_minimal(base_size = 16) +
+        ggplot2::scale_colour_hue(l = 50) +
+        theme_1000(base_size = 16, grid = "none") +
         ggplot2::theme(
             legend.position = "none"
         )
