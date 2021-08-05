@@ -311,6 +311,10 @@ list(
         plot_words_trend(references, sc_stopwords, top_words)
     ),
     tar_target(
+        linked_prop_bar,
+        plot_linked_prop(references, ref_links)
+    ),
+    tar_target(
         overview_figure,
         make_overview_figure(
             platforms_bar_plot,
@@ -351,7 +355,7 @@ list(
             filename = here("output", "trends_figure.png"),
             device   = ragg::agg_png,
             width    = 20,
-            height   = 12,
+            height   = 14,
             units    = "cm",
             res      = 300,
             scaling  = 0.5,
@@ -362,6 +366,7 @@ list(
     tar_target(
         open_figure,
         make_open_figure(
+            linked_prop_bar,
             delay_plot,
             gh_stats_plot,
             publications_models_plot,

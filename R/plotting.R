@@ -135,9 +135,49 @@ plot_platforms_over_time <- function(tools) {
         dplyr::mutate(
             Platform = factor(
                 Platform,
-                levels = c("R", "Py", "CPP", "MATLAB", "Other"),
+                levels = c("R", "Py",     "CPP", "MATLAB", "Other"),
                 labels = c("R", "Python", "C++", "MATLAB", "Other")
             )
+        )
+
+    fits <- platform_dates %>%
+        dplyr::mutate(
+            Percent = Prop * 100,
+            Day     = Date - min(Date)
+        ) %>%
+        dplyr::group_by(Platform) %>%
+        tidyr::nest() %>%
+        dplyr::mutate(
+            model = purrr::map(data, ~ lm(Percent ~ Day, data = .x))
+        ) %>%
+        dplyr::ungroup() %>%
+        plyr::mutate(
+            Intercept = purrr::map_dbl(model, ~ .x$coefficients[1]),
+            Slope     = purrr::map_dbl(model, ~ .x$coefficients[2]),
+            IntStr    = format(
+                Intercept,
+                digits = 1,
+                nsmall = 1,
+                scientific = FALSE,
+                trim = FALSE
+            ),
+            SlopeStr  = format(
+                abs(Slope),
+                digits = 1,
+                scientific = FALSE,
+                trim = TRUE
+            ),
+        ) %>%
+        dplyr::mutate(
+            Label = glue::glue(
+                "**{Platform}**",
+                "<br/>",
+                "(y = {IntStr} {ifelse(Slope > 0, '+', '-')} {SlopeStr}x)"
+            )
+        ) %>%
+        dplyr::mutate(
+            Date = max(platform_dates$Date),
+            Prop = (Intercept + Slope * (Date - min(platform_dates$Date))) / 100
         )
 
     ggplot2::ggplot(
@@ -154,22 +194,17 @@ plot_platforms_over_time <- function(tools) {
             colour = "grey60"
         ) +
         annotate_pub_date() +
-        ggplot2::geom_line(size = 1) +
-        ggrepel::geom_text_repel(
-            data = dplyr::filter(platform_dates, Date == dplyr::last(Date)),
-            ggplot2::aes(label = Platform),
-            hjust             = 0,
-            xlim              = max(platform_dates$Date) + 30,
-            size              = 4,
-            family            = "Noto Sans",
-            segment.size      = 0.7,
-            segment.alpha     = 0.5,
-            segment.linetype  = "dotted",
-            box.padding       = 0.4,
-            segment.curvature = -0.1,
-            segment.ncp       = 3,
-            segment.angle     = 20,
-            seed              = 1
+        ggplot2::geom_smooth(method = "lm", formula = "y ~ x", se = TRUE) +
+        ggplot2::geom_line(size = 1, alpha = 0.5) +
+        ggtext::geom_richtext(
+            data = fits,
+            ggplot2::aes(label = Label),
+            hjust        = 0,
+            size         = 3,
+            fill         = NA,
+            label.colour = NA,
+            lineheight   = 1,
+            family       = "Noto Sans Math"
         ) +
         ggplot2::scale_x_date(
             breaks = seq.Date(
@@ -178,12 +213,12 @@ plot_platforms_over_time <- function(tools) {
                 by = "year"
             ),
             labels = scales::date_format("%Y"),
-            expand = ggplot2::expansion(mult = c(0, 0.15))
+            expand = ggplot2::expansion(mult = c(0, 0.25))
         ) +
         ggplot2::scale_y_continuous(labels = scales::percent) +
         ggplot2::scale_color_brewer(palette = "Set1") +
         ggplot2::labs(
-            x = "Date",
+            x = "Date added to database",
             y = "Percentage of tools in database"
         ) +
         theme_1000(base_size = 16, grid = "none") +
@@ -307,7 +342,7 @@ plot_publication_delay <- function(ref_links, references) {
         ) +
         ggplot2::guides(
            colour = ggplot2::guide_colourbar(
-               barwidth = 20
+               barwidth = 15
            )
         ) +
         theme_1000(base_size = 16) +
@@ -431,19 +466,24 @@ plot_gh_stats <- function(gh_repos) {
     ggplot2::ggplot(stats, ggplot2::aes(x = "A", y = forcats::fct_rev(Stat))) +
         ggplot2::geom_text(
             ggplot2::aes(label = ValueLabel),
-            size    = 12,
+            size    = 10,
             colour  = "#984ea3",
             hjust   = 1,
             nudge_x = -0.01
         ) +
         ggplot2::geom_text(
             ggplot2::aes(label = Stat),
-            size    = 12,
-            colour  = "black",
+            size    = 10,
+            colour  = "grey30",
             hjust   = 0,
             nudge_x = 0.01
         ) +
-        ggplot2::expand_limits(y = c(-2, 8)) +
+        ggplot2::scale_x_discrete(
+            expand = ggplot2::expansion(add = c(0.16, 0.2))
+        ) +
+        ggplot2::scale_y_discrete(
+            expand = ggplot2::expansion(add = c(3, 2))
+        ) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             axis.title = ggplot2::element_blank(),
@@ -1350,7 +1390,7 @@ plot_categories_bar <- function(categories_idx) {
             values = c("black", "white"),
             guide = "none"
         ) +
-        bar_scales(direction = "h", expansion_mult = 0.45) +
+        bar_scales(direction = "h", expansion_mult = 0.3) +
         theme_1000_bar(direction = "h", base_size = 16)
 }
 
@@ -1462,13 +1502,78 @@ plot_words_trend <- function(references, sc_stopwords, top_words) {
             breaks = seq.Date(
                 lubridate::as_date("2017-01-01"),
                 lubridate::as_date("2021-01-01"),
-                by     = "year",
+                by = "year",
             ),
             labels = scales::date_format("%Y")
         ) +
         ggplot2::scale_colour_hue(l = 50) +
+        ggplot2::labs(
+            x = "Publication date",
+            y = "Change in proportion of abstracts"
+        ) +
         theme_1000(base_size = 16, grid = "none") +
         ggplot2::theme(
             legend.position = "none"
+        )
+}
+
+#' Plot linked reference proportion
+#'
+#' Plot a bar chart showing the proportion of publications with linked preprints
+#'
+#' @param references data.frame containing references data
+#' @param ref_links data.frame containing reference links data
+#'
+#' @return ggplot2 object
+plot_linked_prop <- function(references, ref_links) {
+
+    plot_data <- references %>%
+        dplyr::filter(!Preprint) %>%
+        dplyr::mutate(IsLinked = DOI %in% ref_links$Publication) %>%
+        dplyr::group_by(IsLinked) %>%
+        dplyr::count(name = "Count") %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(
+            Prop   = Count / sum(Count),
+            PctStr = format(Prop * 100, digits = 1, nsmall = 1),
+            Label  = glue::glue(
+                "**{ifelse(IsLinked, 'Has preprint', 'No preprint')}**",
+                "<br/>",
+                "{Count}, {PctStr}%"
+            )
+        ) %>%
+        dplyr::arrange(desc(IsLinked)) %>%
+        dplyr::mutate(LabelPos = cumsum(Prop) - Prop * 0.5)
+
+    ggplot2::ggplot(plot_data, ggplot2::aes(x = 1, y = Prop, fill = IsLinked)) +
+        ggplot2::geom_col(position = "stack") +
+        ggtext::geom_richtext(
+            ggplot2::aes(y = LabelPos, label = Label),
+            size         = 5,
+            colour       = "white",
+            fill         = NA,
+            label.colour = NA,
+            lineheight   = 1.5,
+            family       = "Noto Sans"
+        ) +
+        ggtext::geom_richtext(
+            x = 1, y = 1,
+            label = glue::glue("**Publications**<br/>{sum(plot_data$Count)}"),
+            vjust        = 0,
+            size         = 5,
+            fill         = NA,
+            label.colour = NA,
+            lineheight   = 1.5,
+            family       = "Noto Sans"
+        ) +
+        ggplot2::scale_x_discrete(expand = ggplot2::expansion(add = 0.1)) +
+        ggplot2::scale_y_continuous(
+            expand = ggplot2::expansion(mult = c(0.1, 0.2))
+        ) +
+        ggplot2::scale_fill_brewer(palette = "Set1") +
+        theme_1000_bar() +
+        ggplot2::theme(
+            legend.position = "none",
+            axis.line.x     = ggplot2::element_blank()
         )
 }

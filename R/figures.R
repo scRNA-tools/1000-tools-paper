@@ -38,7 +38,7 @@ make_overview_figure <- function(platforms_bar_plot, repositories_bar_plot,
         bars,
         nrow = 2,
         rel_heights = c(1, 1.1),
-        labels = c("", "D"),
+        labels = c("", "C"),
         vjust  = 1
     )
 
@@ -46,8 +46,8 @@ make_overview_figure <- function(platforms_bar_plot, repositories_bar_plot,
         left,
         categories_bar_plot,
         nrow       = 1,
-        rel_widths = c(1, 0.3),
-        labels     = c("", "C"),
+        rel_widths = c(1, 0.4),
+        labels     = c("", "D"),
         hjust      = 1
     )
 }
@@ -66,17 +66,18 @@ make_trends_figure <- function(platforms_time_plot, category_trend_plot,
 
     extrafont::loadfonts(quiet = TRUE)
 
-    patchwork::wrap_plots(
-        A = platforms_time_plot,
-        B = category_trend_plot,
-        C = word_trends_plot,
-        design = "
-            AB
-            CC
-        ",
-        heights = c(1, 0.8)
-    ) +
-        patchwork::plot_annotation(tag_levels = "A")
+    cowplot::plot_grid(
+        cowplot::plot_grid(
+            platforms_time_plot,
+            category_trend_plot,
+            nrow       = 1,
+            rel_widths = c(1, 1),
+            labels     = c("A", "B")
+        ),
+        word_trends_plot,
+        nrow = 2,
+        labels = c("", "C")
+    )
 }
 
 #' Make open science figure
@@ -84,30 +85,32 @@ make_trends_figure <- function(platforms_time_plot, category_trend_plot,
 #' Assemble a figure showing the effect of open science on scRNA-seq analysis
 #' tools
 #'
+#' @param linked_prop_bar ggplot with linked publications proportion bar plot
 #' @param delay_plot ggplot object with delay in publication plot
 #' @param gh_stats_plot ggplot object with GitHub stats overview plot
 #' @param publications_models_plot ggplot object with publications models plot
 #' @param tools_models_plot ggplot object with tools models plot
 #'
 #' @return assembled ggplot object
-make_open_figure <- function(delay_plot, gh_stats_plot,
+make_open_figure <- function(linked_prop_bar, delay_plot, gh_stats_plot,
                              publications_models_plot, tools_models_plot) {
 
     extrafont::loadfonts(quiet = TRUE)
 
     cowplot::plot_grid(
         cowplot::plot_grid(
-            delay_plot,
             gh_stats_plot,
+            linked_prop_bar,
+            delay_plot,
             nrow       = 1,
-            rel_widths = c(1, 0.6),
-            labels     = c("A", "B")
+            rel_widths = c(0.45, 0.2, 1),
+            labels     = c("A", "B", "C")
         ),
         cowplot::plot_grid(
             publications_models_plot,
             tools_models_plot,
             nrow   = 1,
-            labels = c("C", "D")
+            labels = c("D", "E")
         ),
         nrow = 2
     )
