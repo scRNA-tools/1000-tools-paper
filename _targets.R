@@ -38,7 +38,7 @@ tar_option_set(
 list(
     tar_target(
         date,
-        "2021-07-31"
+        "2021-08-09"
     ),
     tar_target(
         tools_sha,
