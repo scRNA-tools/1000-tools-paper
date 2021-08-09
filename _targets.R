@@ -20,7 +20,9 @@ source(here("R", "text_analysis.R"))
 source(here("R", "sankey.R"))
 source(here("R", "mfa.R"))
 source(here("R", "plotting.R"))
-source(here("R",  "theme.R"))
+source(here("R", "other_plots.R"))
+source(here("R", "plot_utils.R"))
+source(here("R", "theme.R"))
 source(here("R", "figures.R"))
 
 #==============================================================================#
