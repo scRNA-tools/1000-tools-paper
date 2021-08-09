@@ -764,7 +764,7 @@ plot_platforms_bar <- function(tools) {
             size         = 5.5,
             family       = "Noto Sans"
         ) +
-        bar_scales(direction = "h", expansion_mult = 0.22) +
+        bar_scales(direction = "h", expansion_mult = 0.25) +
         ggplot2::labs(title = "Platforms", fill = "R/Python") +
         theme_1000_bar(direction = "h", base_size = 16)
 }
@@ -882,7 +882,7 @@ plot_repositories_bar <- function(tools) {
         dplyr::mutate(
             Repo = factor(
                 Repo,
-                levels = c("PyPI", "Multiple", "Bioconductor", "CRAN", "None")
+                levels = c("Bioconductor", "CRAN", "Multiple", "PyPI", "None")
             ),
             RPython = factor(
                 RPython,
@@ -917,7 +917,7 @@ plot_repositories_bar <- function(tools) {
             size         = 5.5,
             family       = "Noto Sans"
         ) +
-        bar_scales(direction = "h", expansion_mult = 0.22) +
+        bar_scales(direction = "h", expansion_mult = 0.25) +
         ggplot2::labs(title = "Repositories", fill = "R/Python") +
         theme_1000_bar(direction = "h", base_size = 16)
 }
