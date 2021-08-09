@@ -512,7 +512,14 @@ plot_publications_models <- function(references, ref_links) {
         "log2(NumReferences + 1)"     = "log2(Num references + 1)"
     )
 
-    models <- dplyr::bind_rows(citations_model, altmetric_model)
+    models <- dplyr::bind_rows(citations_model, altmetric_model) %>%
+        dplyr::mutate(
+            Label = glue::glue(
+                "{format(estimate, digits = 2, nsmall = 1)}",
+                "±",
+                "{format(std.error, digits = 1, nsmall = 1)}"
+            )
+        )
 
     ggplot2::ggplot(
         models,
@@ -520,14 +527,12 @@ plot_publications_models <- function(references, ref_links) {
             x      = estimate,
             y      = term,
             colour = Type,
-            shape  = p.value < 0.05,
-            size   = p.value < 0.05
         )
     ) +
         ggplot2::geom_vline(
             xintercept = 0,
             linetype   = "dashed",
-            colour     = "red",
+            colour     = "#f781bf",
             size       = 1
         ) +
         ggplot2::geom_errorbarh(
@@ -537,10 +542,31 @@ plot_publications_models <- function(references, ref_links) {
             height   = 0.2
         ) +
         ggplot2::geom_point(
+            ggplot2::aes(shape = p.value < 0.05, size = p.value < 0.05),
             position = ggplot2::position_dodge2(width = 0.5),
             stroke   = 1,
             fill     = "white"
         ) +
+        # ggrepel::geom_label_repel(
+        #     ggplot2::aes(
+        #         label = Label,
+        #         group = Type
+        #     ),
+        #     position           = ggplot2::position_dodge(0.6),
+        #     family             = "Noto Sans",
+        #     size               = 4,
+        #     min.segment.length = 0,
+        #     segment.size       = 0.7,
+        #     segment.alpha      = 0.5,
+        #     segment.linetype   = "dotted",
+        #     box.padding        = 0.5,
+        #     label.padding      = 0.15,
+        #     segment.curvature  = -0.1,
+        #     segment.ncp        = 3,
+        #     segment.angle      = 20,
+        #     seed               = 1,
+        #     show.legend        = FALSE
+        # ) +
         ggplot2::scale_y_discrete(labels = term_labels) +
         ggplot2::scale_colour_brewer(palette = "Set1") +
         ggplot2::scale_shape_manual(values = c(21, 16)) +
@@ -639,7 +665,14 @@ plot_tools_models <- function(tools) {
 
     models <- dplyr::bind_rows(
         citations_model, altmetric_model, popularity_model
-    )
+    ) %>%
+        dplyr::mutate(
+            Label = glue::glue(
+                "{format(estimate, digits = 1, nsmall = 1)}",
+                "±",
+                "{format(std.error, digits = 1, nsmall = 1)}"
+            )
+        )
 
     ggplot2::ggplot(
         models,
@@ -654,7 +687,7 @@ plot_tools_models <- function(tools) {
         ggplot2::geom_vline(
             xintercept = 0,
             linetype   = "dashed",
-            colour     = "red",
+            colour     = "#f781bf",
             size       = 1
         ) +
         ggplot2::geom_errorbarh(
@@ -668,6 +701,27 @@ plot_tools_models <- function(tools) {
             stroke   = 1,
             fill     = "white"
         ) +
+        # ggrepel::geom_label_repel(
+        #     ggplot2::aes(
+        #         label = Label,
+        #         group = Type
+        #     ),
+        #     position           = ggplot2::position_dodge(0.4),
+        #     family             = "Noto Sans",
+        #     size               = 3,
+        #     min.segment.length = 0,
+        #     segment.size       = 0.7,
+        #     segment.alpha      = 0.5,
+        #     segment.linetype   = "dotted",
+        #     box.padding        = 0.6,
+        #     label.padding      = 0.15,
+        #     point.padding      = 0.2,
+        #     segment.curvature  = -0.1,
+        #     segment.ncp        = 3,
+        #     segment.angle      = 20,
+        #     seed               = 1,
+        #     show.legend        = FALSE
+        # ) +
         ggplot2::scale_y_discrete(labels = term_labels) +
         ggplot2::scale_colour_brewer(
             palette = "Set1",
