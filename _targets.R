@@ -317,6 +317,10 @@ list(
         plot_linked_prop(references, ref_links)
     ),
     tar_target(
+        categories_platforms_plot,
+        plot_categories_platforms(categories_idx, tools)
+    ),
+    tar_target(
         overview_figure,
         make_overview_figure(
             platforms_bar_plot,

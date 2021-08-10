@@ -296,3 +296,70 @@ plot_dependencies <- function(r_dependencies, pypi_dependencies) {
         ggraph::scale_edge_color_brewer(palette = "Dark2") +
         ggraph::theme_graph()
 }
+
+#' Plot categories platforms
+#'
+#' Plot platform proportions for each analysis category
+#'
+#' @param categories_idx data.frame containing categories index
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot object
+plot_categories_platforms <- function(categories_idx, tools) {
+
+    plot_data <- categories_idx %>%
+        dplyr::left_join(tools, by = "Tool") %>%
+        dplyr::mutate(
+            RPython = dplyr::case_when(
+                PlatformR & PlatformPy ~ "Both",
+                PlatformR              ~ "R",
+                PlatformPy             ~ "Python",
+                TRUE                   ~ "Other"
+            )
+        ) %>%
+        dplyr::select(Tool, RPython, Category) %>%
+        dplyr::group_by(Category, RPython) %>%
+        dplyr::count(name = "Count") %>%
+        dplyr::group_by(Category) %>%
+        dplyr::mutate(Total = sum(Count)) %>%
+        dplyr::mutate(Prop = Count / sum(Count)) %>%
+        dplyr::ungroup() %>%
+        dplyr::arrange(Total) %>%
+        dplyr::mutate(
+            Category = stringr::str_replace_all(
+                Category, "([[:upper:]])", " \\1"
+            ),
+            Category = stringr::str_trim(Category),
+            Category = stringr::str_to_sentence(Category),
+            Category = dplyr::case_when(
+                Category == "U m is"                   ~ "UMIs",
+                Category == "Dimensionality reduction" ~ "Dim. red.",
+                Category == "Differential expression"  ~ "Diff. expression",
+                TRUE                                   ~ Category
+            ),
+            Category = factor(Category, levels = unique(Category)),
+            RPython = factor(
+                RPython,
+                levels = c("R", "Both", "Python", "Other")
+            )
+        )
+
+    ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(x = Prop, y = Category, fill = RPython)
+    ) +
+        ggplot2::geom_col() +
+        ggplot2::geom_vline(xintercept = c(0.25, 0.5, 0.75), colour = "white") +
+        bar_scales(direction = "h") +
+        ggplot2::scale_x_continuous(
+            labels = scales::percent,
+            expand = ggplot2::expansion(mult = c(0, 0.05))
+        ) +
+        ggplot2::labs(fill = "R/Python") +
+        theme_1000_bar(direction = "h", base_size = 16) +
+        ggplot2::theme(
+            axis.text.x = ggplot2::element_text(),
+            axis.text.y = ggplot2::element_text(),
+            legend.position = "bottom"
+        )
+}
