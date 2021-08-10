@@ -20,6 +20,7 @@ source(here("R", "text_analysis.R"))
 source(here("R", "sankey.R"))
 source(here("R", "mfa.R"))
 source(here("R", "plotting.R"))
+source(here("R", "supplementary_plots.R"))
 source(here("R", "other_plots.R"))
 source(here("R", "plot_utils.R"))
 source(here("R", "theme.R"))
@@ -302,6 +303,21 @@ list(
         plot_dependencies(r_dependencies, pypi_dependencies)
     ),
     tar_target(
+        dependencies_plot_png,
+        ggplot2::ggsave(
+            plot     = dependencies_plot,
+            filename = here("output", "supplementary", "dependencies.png"),
+            device   = ragg::agg_png,
+            width    = 20,
+            height   = 24,
+            units    = "cm",
+            res      = 300,
+            scaling  = 1,
+            bg       = "white"
+        ),
+        format = "file"
+    ),
+    tar_target(
         publications_models_plot,
         plot_publications_models(references, ref_links)
     ),
@@ -348,7 +364,7 @@ list(
         overview_figure_png,
         ggplot2::ggsave(
             plot     = overview_figure,
-            filename = here("output", "overview_figure.png"),
+            filename = here("output", "figures", "overview.png"),
             device   = ragg::agg_png,
             width    = 20,
             height   = 14,
@@ -371,7 +387,7 @@ list(
         trends_figure_png,
         ggplot2::ggsave(
             plot     = trends_figure,
-            filename = here("output", "trends_figure.png"),
+            filename = here("output", "figures", "trends.png"),
             device   = ragg::agg_png,
             width    = 20,
             height   = 14,
@@ -396,7 +412,7 @@ list(
         open_figure_png,
         ggplot2::ggsave(
             plot     = open_figure,
-            filename = here("output", "open_figure.png"),
+            filename = here("output", "figures", "open.png"),
             device   = ragg::agg_png,
             width    = 20,
             height   = 16,
