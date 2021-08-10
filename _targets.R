@@ -303,7 +303,7 @@ list(
         plot_dependencies(r_dependencies, pypi_dependencies)
     ),
     tar_target(
-        dependencies_plot_png,
+        dependencies_png,
         ggplot2::ggsave(
             plot     = dependencies_plot,
             filename = here("output", "supplementary", "dependencies.png"),
@@ -344,6 +344,23 @@ list(
     tar_target(
         categories_platforms_plot,
         plot_categories_platforms(categories_idx, tools)
+    ),
+    tar_target(
+        categories_platforms_png,
+        ggplot2::ggsave(
+            plot     = categories_platforms_plot,
+            filename = here(
+                "output", "supplementary", "categories_platforms.png"
+            ),
+            device   = ragg::agg_png,
+            width    = 16,
+            height   = 20,
+            units    = "cm",
+            res      = 300,
+            scaling  = 0.8,
+            bg       = "white"
+        ),
+        format = "file"
     ),
     tar_target(
         categories_per_tool_plot,
