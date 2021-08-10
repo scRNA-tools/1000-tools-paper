@@ -367,6 +367,23 @@ list(
         plot_categories_per_tool(categories_idx, tools)
     ),
     tar_target(
+        categories_per_tool_png,
+        ggplot2::ggsave(
+            plot     = categories_per_tool_plot,
+            filename = here(
+                "output", "supplementary", "categories_per_tool.png"
+            ),
+            device   = ragg::agg_png,
+            width    = 20,
+            height   = 14,
+            units    = "cm",
+            res      = 300,
+            scaling  = 0.8,
+            bg       = "white"
+        ),
+        format = "file"
+    ),
+    tar_target(
         overview_figure,
         make_overview_figure(
             platforms_bar_plot,
