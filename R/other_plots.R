@@ -363,3 +363,98 @@ plot_categories_platforms <- function(categories_idx, tools) {
             legend.position = "bottom"
         )
 }
+
+#' Plot categories per tool
+#'
+#' Plot categories per tool divided by R/Python and year added to database
+#'
+#' @param categories_idx data.frame containing categories index
+#' @param tools data.frame containing tools data
+#'
+#' @details
+#' A violin plot is plotted for each year with points showing individual tools.
+#' Large points indicate yearly means, connected by lines to show trends.
+#'
+#' @return ggplot object
+plot_categories_per_tool <- function(categories_idx, tools) {
+
+    plot_data <- categories_idx %>%
+        dplyr::left_join(tools, by = "Tool") %>%
+        dplyr::mutate(
+            RPython = dplyr::case_when(
+                PlatformR & PlatformPy ~ "Both",
+                PlatformR              ~ "R",
+                PlatformPy             ~ "Python",
+                TRUE                   ~ "Other"
+            )
+        ) %>%
+        dplyr::mutate(Year = lubridate::year(Added)) %>%
+        dplyr::select(Tool, RPython, Category, Year) %>%
+        dplyr::group_by(Tool, RPython, Year) %>%
+        dplyr::count(name = "Count") %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(
+            RPython = factor(
+                RPython,
+                levels = c("R", "Both", "Python", "Other")
+            )
+        )
+
+    means <- plot_data %>%
+        dplyr::group_by(RPython, Year) %>%
+        dplyr::summarise(Mean = mean(Count), .groups = "drop")
+
+    ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(
+            x      = factor(Year),
+            y      = Count,
+            colour = RPython
+        )
+    ) +
+        ggplot2::geom_violin(
+            ggplot2::aes(fill = RPython),
+            draw_quantiles = c(0.25, 0.5, 0.75),
+            adjust = 2,
+            alpha  = 0.4,
+            colour = "white"
+        ) +
+        ggforce::geom_sina(alpha = 0.5, size = 0.5) +
+        ggplot2::geom_line(
+            data = means,
+            ggplot2::aes(y = Mean, group = RPython),
+            size   = 2,
+            colour = "white"
+        ) +
+        ggplot2::geom_line(
+            data = means,
+            ggplot2::aes(y = Mean, group = RPython),
+            size = 1
+        ) +
+        ggplot2::geom_point(
+            data = means,
+            ggplot2::aes(y = Mean),
+            size   = 4,
+            colour = "white"
+        ) +
+        ggplot2::geom_point(
+            data = means,
+            ggplot2::aes(y = Mean),
+            size   = 2,
+            stroke = 1,
+            fill   = "white"
+        ) +
+        ggplot2::facet_grid(RPython ~ .) +
+        ggplot2::scale_y_continuous(breaks = seq(0, 20, 2)) +
+        ggplot2::scale_fill_brewer(palette = "Set1") +
+        ggplot2::scale_colour_brewer(palette = "Set1") +
+        ggplot2::labs(
+            x = "Year added to database",
+            y = "Number of categories"
+        ) +
+        theme_1000(base_size = 16) +
+        ggplot2::theme(
+            legend.position  = "none",
+            panel.grid.minor = ggplot2::element_blank()
+        )
+}

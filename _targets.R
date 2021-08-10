@@ -321,6 +321,10 @@ list(
         plot_categories_platforms(categories_idx, tools)
     ),
     tar_target(
+        categories_per_tool_plot,
+        plot_categories_per_tool(categories_idx, tools)
+    ),
+    tar_target(
         overview_figure,
         make_overview_figure(
             platforms_bar_plot,
