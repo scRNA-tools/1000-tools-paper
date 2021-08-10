@@ -1043,15 +1043,17 @@ plot_repositories_bar <- function(tools) {
 #' Plot a bar chart showing how many tools are in different categories
 #'
 #' @param categories_idx data.frame containing categories index
+#' @param category_descs data.frame containing category descriptions
 #'
 #' @return ggplot object
-plot_categories_bar <- function(categories_idx) {
+plot_categories_bar <- function(categories_idx, category_descs) {
 
     plot_data <- categories_idx %>%
         dplyr::group_by(Category) %>%
         dplyr::count(name = "Count") %>%
         dplyr::ungroup() %>%
         dplyr::arrange(Count) %>%
+        dplyr::left_join(category_descs, by = "Category") %>%
         dplyr::mutate(
             Category = stringr::str_replace_all(
                 Category, "([[:upper:]])", " \\1"
@@ -1086,12 +1088,26 @@ plot_categories_bar <- function(categories_idx) {
             size         = 4.5,
             family       = "Noto Sans"
         ) +
+
         ggplot2::scale_colour_manual(
             values = c("black", "white"),
             guide = "none"
         ) +
         bar_scales(direction = "h", expansion_mult = 0.3) +
-        theme_1000_bar(direction = "h", base_size = 16)
+        ggplot2::facet_grid(
+            Phase ~ .,
+            scales = "free_y",
+            space  = "free_y",
+            switch = "y"
+        ) +
+        theme_1000_bar(direction = "h", base_size = 16) +
+        ggplot2::theme(
+            strip.placement = "outside",
+            strip.text      = ggplot2::element_text(
+                face   = "bold",
+                margin = ggplot2::margin(0.1, 0.1, 0.1, 0.1)
+            )
+        )
 }
 
 #' Plot words trend

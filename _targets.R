@@ -52,6 +52,15 @@ list(
         load_tools_sha(tools_sha)
     ),
     tar_target(
+        category_descs_sha,
+        get_path_sha("database/categories.tsv", date = date),
+        cue = tar_cue("always")
+    ),
+    tar_target(
+        category_descs,
+        load_category_descs_sha(category_descs_sha)
+    ),
+    tar_target(
         categories_idx_sha,
         get_path_sha("database/categories-idx.tsv", date = date),
         cue = tar_cue("always")
@@ -200,7 +209,7 @@ list(
     ),
     tar_target(
         categories_bar_plot,
-        plot_categories_bar(categories_idx)
+        plot_categories_bar(categories_idx, category_descs)
     ),
     tar_target(
         mfa_variables,

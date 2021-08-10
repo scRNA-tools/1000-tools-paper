@@ -18,6 +18,44 @@ load_tools <- function(file) {
     )
 }
 
+#' Load category descriptions
+#'
+#' @param file Path to category descriptions TSV file, passed to
+#' `readr::read_tsv()`
+#'
+#' @return tibble containing categories descriptions
+load_category_descs <- function(file) {
+    readr::read_tsv(
+        file,
+        col_types = readr::cols(
+            Category    = readr::col_character(),
+            Phase       = readr::col_character(),
+            Description = readr::col_character()
+        )
+    ) %>%
+        dplyr::mutate(
+            Phase = factor(
+                Phase,
+                levels = c(
+                    "Phase 1",
+                    "Phase 2",
+                    "Phase 3",
+                    "Phase 4",
+                    "Multiple",
+                    "Other"
+                ),
+                labels = c(
+                    "Data\nacquisition",
+                    "Data cleaning",
+                    "Cell assignment",
+                    "Gene\nidentification",
+                    "Multiple",
+                    "Other"
+                )
+            ),
+        )
+}
+
 #' Load categories index
 #'
 #' @param file Path to categories index TSV file, passed to `readr::read_tsv()`
@@ -153,6 +191,23 @@ load_tools_sha <- function(sha) {
             "https://github.com/scRNA-tools/scRNA-tools/raw/",
             sha,
             "/database/tools.tsv"
+        )
+    )
+}
+
+#' Load category descriptions from SHA
+#'
+#' Load the category descriptions from GitHub corresponding to a specific commit
+#'
+#' @param sha SHA hash corresponding to a git commit
+#'
+#' @return tibble containing category descriptions
+load_category_descs_sha <- function(sha) {
+    load_category_descs(
+        glue::glue(
+            "https://github.com/scRNA-tools/scRNA-tools/raw/",
+            sha,
+            "/database/categories.tsv"
         )
     )
 }
