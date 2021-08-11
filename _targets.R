@@ -25,6 +25,7 @@ source(here("R", "other_plots.R"))
 source(here("R", "plot_utils.R"))
 source(here("R", "theme.R"))
 source(here("R", "figures.R"))
+source(here("R", "output.R"))
 
 #==============================================================================#
 # ---- OPTIONS ----
@@ -185,6 +186,28 @@ list(
     tar_target(
         pypi_dependencies,
         get_pypi_deps(pypi_pkgs, johnnydep_path)
+    ),
+    tar_target(
+        save_data_tables,
+        save_data_tables(
+            category_descs    = category_descs,
+            categories_idx    = categories_idx,
+            categories        = categories,
+            references        = references,
+            doi_idx           = doi_idx,
+            ref_links         = ref_links,
+            repositories      = repositories,
+            gh_repos          = gh_repos,
+            tools             = tools,
+            ga_users          = ga_users,
+            ga_countries      = ga_countries,
+            r_dependencies    = r_dependencies,
+            pypi_dependencies = pypi_dependencies,
+            dir               = here("output", "data-tables"),
+            strict            = TRUE,
+            clear             = TRUE
+        ),
+        format = "file"
     ),
     tar_target(
         sankey,
