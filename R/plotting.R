@@ -514,56 +514,12 @@ plot_category_prop_trend <- function(categories, tools) {
 
 #' Plot publications models
 #'
-#' Plot coefficients for linear models predicting citations and Altmetric score
-#' for publications using [ggstatsplot::ggcoefstats()].
+#' Plot coefficients for publications models
 #'
-#' @param references data.frame containing references data
-#' @param ref_links data.frame containing publication-preprint links
-#'
-#' @details
-#' Uses a simplified version of the model from Fu and Hughey 10.7554/eLife.52646
-#' which excludes terms about affiliation, last author and MeSH keywords. The
-#' model for citations looks like:
-#'
-#' `log(Citations + 1) ~ log2(NumReferences + 1) + log2(NumAuthors) +
-#' HasPreprint + splines::ns(Years, df = 3)`
-#'
-#' The Altmetric score model is the same with Altmetric score replacing
-#' citations.
+#' @param publications_models list containing publications models
 #'
 #' @return ggplot2 object
-plot_publications_models <- function(references, ref_links) {
-
-    model_data <- references %>%
-        dplyr::filter(
-            !Preprint,
-            Years > 0
-        ) %>%
-        dplyr::mutate(HasPreprint = DOI %in% ref_links$Publication) %>%
-        dplyr::select(HasPreprint, Years, NumAuthors, NumReferences, Citations,
-                      Altmetric)
-
-    citations_model <- lm(
-        log2(Citations + 1) ~
-            log2(NumReferences + 1) +
-            log2(NumAuthors) +
-            HasPreprint +
-            splines::ns(Years, df = 3),
-        data = model_data
-    ) %>%
-        ggstatsplot::ggcoefstats(output = "tidy") %>%
-        dplyr::mutate(Type = "Citations")
-
-    altmetric_model <- lm(
-        log2(Altmetric + 1) ~
-            log2(NumReferences + 1) +
-            log2(NumAuthors) +
-            HasPreprint +
-            splines::ns(Years, df = 3),
-        data = dplyr::filter(model_data, !is.na(Altmetric))
-    ) %>%
-        ggstatsplot::ggcoefstats(output = "tidy") %>%
-        dplyr::mutate(Type = "Altmetric")
+plot_publications_models <- function(publication_models) {
 
     term_labels <- c(
         "splines::ns(Years, df = 3)3" = "Years (3rd degree)",
@@ -574,145 +530,25 @@ plot_publications_models <- function(references, ref_links) {
         "log2(NumReferences + 1)"     = "log2(Num references + 1)"
     )
 
-    models <- dplyr::bind_rows(citations_model, altmetric_model) %>%
-        dplyr::mutate(
-            Label = glue::glue(
-                "{format(estimate, digits = 2, nsmall = 1)}",
-                "±",
-                "{format(std.error, digits = 1, nsmall = 1)}"
-            )
+    models_df <- tidy_models(
+        publication_models,
+        types = c(
+            citations     = "Citations",
+            altmetric     = "Altmetric"
         )
+    )
 
-    ggplot2::ggplot(
-        models,
-        ggplot2::aes(
-            x      = estimate,
-            y      = term,
-            colour = Type,
-        )
-    ) +
-        ggplot2::geom_vline(
-            xintercept = 0,
-            linetype   = "dashed",
-            colour     = "#f781bf",
-            size       = 1
-        ) +
-        ggplot2::geom_errorbarh(
-            ggplot2::aes(xmin = conf.low, xmax = conf.high),
-            position = ggplot2::position_dodge(width = 0.5),
-            size     = 0.5,
-            height   = 0.2
-        ) +
-        ggplot2::geom_point(
-            ggplot2::aes(shape = p.value < 0.05, size = p.value < 0.05),
-            position = ggplot2::position_dodge2(width = 0.5),
-            stroke   = 1,
-            fill     = "white"
-        ) +
-        # ggrepel::geom_label_repel(
-        #     ggplot2::aes(
-        #         label = Label,
-        #         group = Type
-        #     ),
-        #     position           = ggplot2::position_dodge(0.6),
-        #     family             = "Noto Sans",
-        #     size               = 4,
-        #     min.segment.length = 0,
-        #     segment.size       = 0.7,
-        #     segment.alpha      = 0.5,
-        #     segment.linetype   = "dotted",
-        #     box.padding        = 0.5,
-        #     label.padding      = 0.15,
-        #     segment.curvature  = -0.1,
-        #     segment.ncp        = 3,
-        #     segment.angle      = 20,
-        #     seed               = 1,
-        #     show.legend        = FALSE
-        # ) +
-        ggplot2::scale_y_discrete(labels = term_labels) +
-        ggplot2::scale_colour_brewer(palette = "Set1") +
-        ggplot2::scale_shape_manual(values = c(21, 16)) +
-        ggplot2::scale_size_manual(values = c(2.2, 3)) +
-        ggplot2::labs(x = "Coefficient") +
-        theme_1000(base_size = 14) +
-        ggplot2::theme(
-            axis.title.y    = ggplot2::element_blank(),
-            legend.position = "bottom",
-            legend.box      = "vertical",
-            legend.margin   = ggplot2::margin(t = -8)
-        )
+    plot_models(models_df, term_labels)
 }
 
 #' Plot tools models
 #'
-#' Plot coefficients for linear models predicting citations, Altmetric score and
-#' GitHub popularity for tools using [ggstatsplot::ggcoefstats()].
+#' Plot coefficients for tools models
 #'
-#' @param tools data.frame containing tools data
-#'
-#' @details
-#' Uses a model inspired by the model from Fu and Hughey 10.7554/eLife.52646
-#' for publications. The model for citations looks like:
-#'
-#' `log(Citations + 1) ~ Platform + HasRepo + splines::ns(GHAgeYears, df = 3)`
-#'
-#' The Altmetric score and GitHub popularity models are the same with those
-#' values replacing citations.
+#' @param tools_models list containing tools models
 #'
 #' @return ggplot2 object
-plot_tools_models <- function(tools) {
-
-    model_data <- tools %>%
-        dplyr::mutate(
-            Platform     = dplyr::case_when(
-                PlatformR & PlatformPy ~ "Both",
-                PlatformR              ~ "R",
-                PlatformPy             ~ "Python",
-                TRUE                   ~ "Other"
-            ),
-            HasRepo       = Bioc | CRAN | PyPI,
-            GHPopularity  = GHPopularity / log10(2) # Change to log base 2
-        ) %>%
-        dplyr::mutate(
-            Platform = factor(
-                Platform,
-                levels = c("Other", "R", "Python", "Both")
-            )
-        ) %>%
-        dplyr::select(
-            Platform, HasRepo, GHAgeYears, TotalCitations, TotalAltmetric,
-            GHPopularity
-        )
-
-    citations_model <- lm(
-        log2(TotalCitations + 1) ~
-            Platform +
-            HasRepo +
-            splines::ns(GHAgeYears, df = 3),
-        data = dplyr::filter(model_data, !is.na(TotalCitations))
-    ) %>%
-        ggstatsplot::ggcoefstats(output = "tidy") %>%
-        dplyr::mutate(Type = "Citations")
-
-    altmetric_model <- lm(
-        log2(TotalAltmetric + 1) ~
-            Platform +
-            HasRepo +
-            splines::ns(GHAgeYears, df = 3),
-        data = dplyr::filter(model_data, !is.na(TotalAltmetric))
-    ) %>%
-        ggstatsplot::ggcoefstats(output = "tidy") %>%
-        dplyr::mutate(Type = "Altmetric")
-
-    popularity_model <- lm(
-        GHPopularity ~
-            Platform +
-            HasRepo +
-            splines::ns(GHAgeYears, df = 3),
-        data =dplyr::filter(model_data, !is.na(GHPopularity))
-    ) %>%
-        ggstatsplot::ggcoefstats(output = "tidy") %>%
-        dplyr::mutate(Type = "GHPopularity")
+plot_tools_models <- function(tools_models) {
 
     term_labels <- c(
         "(Intercept)"                      = "(Intercept)",
@@ -725,19 +561,59 @@ plot_tools_models <- function(tools) {
         "splines::ns(GHAgeYears, df = 3)1" = "Years (1st degree)"
     )
 
-    models <- dplyr::bind_rows(
-        citations_model, altmetric_model, popularity_model
-    ) %>%
-        dplyr::mutate(
-            Label = glue::glue(
-                "{format(estimate, digits = 1, nsmall = 1)}",
-                "±",
-                "{format(std.error, digits = 1, nsmall = 1)}"
-            )
+    models_df <- tidy_models(
+        tools_models,
+        types = c(
+            citations     = "Total citations",
+            altmetric     = "Total altmetric",
+            gh_popularity = "GitHub popularity"
         )
+    )
+
+    plot_models(models_df, term_labels)
+}
+
+#' Plot models
+#'
+#' @param models_df data.frame containing tidy model coefficients from
+#' `tidy_models()`
+#' @param term_labels Named character vector with labels for coefficient terms
+#'
+#' @return ggplot2 object
+plot_models <- function(models_df, term_labels) {
+    # models_df <- models_df %>%
+    #     dplyr::mutate(
+    #         Label = glue::glue(
+    #             "{format(estimate, digits = 1, nsmall = 1)}",
+    #             "±",
+    #             "{format(std.error, digits = 1, nsmall = 1)}"
+    #         )
+    #     )
+
+    # ggrepel::geom_label_repel(
+    #     ggplot2::aes(
+    #         label = Label,
+    #         group = Type
+    #     ),
+    #     position           = ggplot2::position_dodge(0.4),
+    #     family             = "Noto Sans",
+    #     size               = 3,
+    #     min.segment.length = 0,
+    #     segment.size       = 0.7,
+    #     segment.alpha      = 0.5,
+    #     segment.linetype   = "dotted",
+    #     box.padding        = 0.6,
+    #     label.padding      = 0.15,
+    #     point.padding      = 0.2,
+    #     segment.curvature  = -0.1,
+    #     segment.ncp        = 3,
+    #     segment.angle      = 20,
+    #     seed               = 1,
+    #     show.legend        = FALSE
+    # ) +
 
     ggplot2::ggplot(
-        models,
+        models_df,
         ggplot2::aes(
             x      = estimate,
             y      = term,
@@ -763,34 +639,8 @@ plot_tools_models <- function(tools) {
             stroke   = 1,
             fill     = "white"
         ) +
-        # ggrepel::geom_label_repel(
-        #     ggplot2::aes(
-        #         label = Label,
-        #         group = Type
-        #     ),
-        #     position           = ggplot2::position_dodge(0.4),
-        #     family             = "Noto Sans",
-        #     size               = 3,
-        #     min.segment.length = 0,
-        #     segment.size       = 0.7,
-        #     segment.alpha      = 0.5,
-        #     segment.linetype   = "dotted",
-        #     box.padding        = 0.6,
-        #     label.padding      = 0.15,
-        #     point.padding      = 0.2,
-        #     segment.curvature  = -0.1,
-        #     segment.ncp        = 3,
-        #     segment.angle      = 20,
-        #     seed               = 1,
-        #     show.legend        = FALSE
-        # ) +
         ggplot2::scale_y_discrete(labels = term_labels) +
-        ggplot2::scale_colour_brewer(
-            palette = "Set1",
-            labels = c(
-                "Total Altmetric", "Total citations", "GitHub popularity"
-            )
-        ) +
+        ggplot2::scale_colour_brewer(palette = "Set1") +
         ggplot2::scale_shape_manual(values = c(21, 16)) +
         ggplot2::scale_size_manual(values = c(2.2, 3)) +
         ggplot2::labs(x = "Coefficient") +

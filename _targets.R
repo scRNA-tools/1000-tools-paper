@@ -19,6 +19,7 @@ source(here("R", "dependencies.R"))
 source(here("R", "text_analysis.R"))
 source(here("R", "sankey.R"))
 source(here("R", "mfa.R"))
+source(here("R", "modelling.R"))
 source(here("R", "plotting.R"))
 source(here("R", "supplementary_plots.R"))
 source(here("R", "other_plots.R"))
@@ -281,6 +282,14 @@ list(
         umap,
         uwot::umap(mfa$ind$coord, min_dist = 1)
     ),
+    tar_target(
+        publications_models,
+        model_publications(references, ref_links)
+    ),
+    tar_target(
+        tools_models,
+        model_tools(tools)
+    ),
     website_analytics,
     ##====================================================================##
     ## ---- Plotting ----
@@ -327,11 +336,11 @@ list(
     ),
     tar_target(
         publications_models_plot,
-        plot_publications_models(references, ref_links)
+        plot_publications_models(publications_models)
     ),
     tar_target(
         tools_models_plot,
-        plot_tools_models(tools)
+        plot_tools_models(tools_models)
     ),
     tar_target(
         word_trends_plot,
