@@ -60,12 +60,10 @@ plot_dependencies <- function(r_dependencies, pypi_dependencies) {
 
     patchwork::wrap_plots(
         r_plot,
-        py_plot
-    ) +
-        patchwork::plot_layout(
-            ncol   = 1,
-            guides = "collect"
-        )
+        py_plot,
+        ncol   = 1,
+        guides = "collect"
+    )
 }
 
 #' Plot dependencies graph
