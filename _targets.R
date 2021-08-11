@@ -39,33 +39,122 @@ tar_option_set(
 # ---- PIPELINE ----
 #==============================================================================#
 
+##====================================================================##
+## ---- Website analytics ----
+##====================================================================##
+
+# This should be set to FALSE unless you have access to Google Analytics
+include_analytics <- TRUE
+
+if (include_analytics) {
+    rlang::warn(paste(
+        "Including website analytics.",
+        "This will fail unless you have access to Google Analytics",
+        "and have set up authentication.",
+        "Set the `include_analytics` variable to FALSE in `_targets.R`",
+        "to turn this off."
+    ))
+
+    website_analytics <- list(
+        tar_target(
+            ga_users,
+            {
+                googleAnalyticsR::ga_auth()
+                load_ga_users(date)
+            },
+            packages = "googleAnalyticsR"
+        ),
+        tar_target(
+            ga_countries,
+            {
+                googleAnalyticsR::ga_auth()
+                load_ga_countries(date)
+            },
+            packages = "googleAnalyticsR"
+        ),
+        tar_target(
+            users_plot,
+            plot_users(ga_users)
+        ),
+        tar_target(
+            users_map,
+            plot_users_map(ga_countries)
+        ),
+        tar_target(
+            save_ga_data,
+            save_data_tables(
+                ga_users     = ga_users,
+                ga_countries = ga_countries,
+                dir          = here("output", "analytics-data"),
+                strict       = TRUE,
+                clear        = TRUE
+            ),
+            format = "file"
+        )
+    )
+} else {
+    website_analytics <- NULL
+}
+
 list(
+    ##====================================================================##
+    ## ---- Dependencies ----
+    ##====================================================================##
     tar_target(
         date,
         "2021-08-09"
     ),
     tar_target(
+        johnnydep_path,
+        {
+            path <- Sys.getenv("JOHNNYDEP_PATH")
+            if (path == "") {
+                stop("johnnydep path not found. See README.")
+            }
+            path
+        }
+    ),
+    ##====================================================================##
+    ## ---- GitHub SHAs ----
+    ##====================================================================##
+    tar_target(
         tools_sha,
         get_path_sha("database/tools.tsv", date = date),
-        cue = tar_cue("always")
     ),
+    tar_target(
+        category_descs_sha,
+        get_path_sha("database/categories.tsv", date = date),
+    ),
+    tar_target(
+        categories_idx_sha,
+        get_path_sha("database/categories-idx.tsv", date = date),
+    ),
+    tar_target(
+        references_sha,
+        get_path_sha("database/references.tsv", date = date),
+    ),
+    tar_target(
+        repositories_sha,
+        get_path_sha("database/repositories.tsv", date = date),
+    ),
+    tar_target(
+        doi_idx_sha,
+        get_path_sha("database/doi-idx.tsv", date = date),
+    ),
+    tar_target(
+        ref_links_sha,
+        get_path_sha("database/reference-links.tsv", date = date),
+    ),
+    ##====================================================================##
+    ## ---- Loading ----
+    ##====================================================================##
     tar_target(
         tools_raw,
         load_tools_sha(tools_sha)
     ),
     tar_target(
-        category_descs_sha,
-        get_path_sha("database/categories.tsv", date = date),
-        cue = tar_cue("always")
-    ),
-    tar_target(
         category_descs,
         load_category_descs_sha(category_descs_sha)
-    ),
-    tar_target(
-        categories_idx_sha,
-        get_path_sha("database/categories-idx.tsv", date = date),
-        cue = tar_cue("always")
     ),
     tar_target(
         categories_idx,
@@ -81,32 +170,12 @@ list(
             dplyr::rename(Tool = CatTool)
     ),
     tar_target(
-        references_sha,
-        get_path_sha("database/references.tsv", date = date),
-        cue = tar_cue("always")
-    ),
-    tar_target(
         references,
         load_references_sha(references_sha)
     ),
     tar_target(
-        repositories_sha,
-        get_path_sha("database/repositories.tsv", date = date),
-        cue = tar_cue("always")
-    ),
-    tar_target(
-        doi_idx_sha,
-        get_path_sha("database/doi-idx.tsv", date = date),
-        cue = tar_cue("always")
-    ),
-    tar_target(
         doi_idx,
         load_doi_idx_sha(doi_idx_sha)
-    ),
-    tar_target(
-        ref_links_sha,
-        get_path_sha("database/reference-links.tsv", date = date),
-        cue = tar_cue("always")
     ),
     tar_target(
         ref_links,
@@ -123,34 +192,6 @@ list(
     tar_target(
         tools,
         augment_tools(tools_raw, references, doi_idx, repositories, gh_repos)
-    ),
-    tar_target(
-        ga_users,
-        {
-            googleAnalyticsR::ga_auth()
-            load_ga_users(date)
-        },
-        packages = "googleAnalyticsR",
-        cue      = tar_cue("always")
-    ),
-    tar_target(
-        ga_countries,
-        {
-            googleAnalyticsR::ga_auth()
-            load_ga_countries(date)
-        },
-        packages = "googleAnalyticsR",
-        cue      = tar_cue("always")
-    ),
-    tar_target(
-        johnnydep_path,
-        {
-            path <- Sys.getenv("JOHNNYDEP_PATH")
-            if (path == "") {
-                stop("johnnydep path not found. See README.")
-            }
-            path
-        }
     ),
     tar_target(
         bioc_pkgs,
@@ -188,53 +229,16 @@ list(
         get_pypi_deps(pypi_pkgs, johnnydep_path)
     ),
     tar_target(
-        save_data_tables,
-        save_data_tables(
-            category_descs    = category_descs,
-            categories_idx    = categories_idx,
-            categories        = categories,
-            references        = references,
-            doi_idx           = doi_idx,
-            ref_links         = ref_links,
-            repositories      = repositories,
-            gh_repos          = gh_repos,
-            tools             = tools,
-            ga_users          = ga_users,
-            ga_countries      = ga_countries,
-            r_dependencies    = r_dependencies,
-            pypi_dependencies = pypi_dependencies,
-            dir               = here("output", "data-tables"),
-            strict            = TRUE,
-            clear             = TRUE
-        ),
-        format = "file"
+        sc_stopwords,
+        get_sc_stopwords()
     ),
     tar_target(
-        sankey,
-        plot_sankey(
-            data   = get_sankey_data(tools),
-            value  = "Count",
-            colour = "Platform",
-            width  = 0.2,
-            space  = 0.05
-        )
+        top_words,
+        get_top_words()
     ),
-    tar_target(
-        platforms_bar_plot,
-        plot_platforms_bar(tools)
-    ),
-    tar_target(
-        licenses_bar_plot,
-        plot_licenses_bar(tools)
-    ),
-    tar_target(
-        repositories_bar_plot,
-        plot_repositories_bar(tools)
-    ),
-    tar_target(
-        categories_bar_plot,
-        plot_categories_bar(categories_idx, category_descs)
-    ),
+    ##====================================================================##
+    ## ---- Modelling ----
+    ##====================================================================##
     tar_target(
         mfa_variables,
         get_mfa_variables()
@@ -277,9 +281,25 @@ list(
         umap,
         uwot::umap(mfa$ind$coord, min_dist = 1)
     ),
+    website_analytics,
+    ##====================================================================##
+    ## ---- Plotting ----
+    ##====================================================================##
     tar_target(
-        landscape_umap,
-        plot_landscape_umap(mfa_data, hcpc, umap)
+        platforms_bar_plot,
+        plot_platforms_bar(tools)
+    ),
+    tar_target(
+        licenses_bar_plot,
+        plot_licenses_bar(tools)
+    ),
+    tar_target(
+        repositories_bar_plot,
+        plot_repositories_bar(tools)
+    ),
+    tar_target(
+        categories_bar_plot,
+        plot_categories_bar(categories_idx, category_descs)
     ),
     tar_target(
         tools_plot,
@@ -302,25 +322,28 @@ list(
         plot_gh_stats(gh_repos)
     ),
     tar_target(
-        category_props_plot,
-        plot_category_props(categories, tools)
-    ),
-    tar_target(
-        category_barcodes_plot,
-        plot_category_barcodes(categories, tools)
-    ),
-    tar_target(
         category_trend_plot,
         plot_category_prop_trend(categories, tools)
     ),
     tar_target(
-        users_plot,
-        plot_users(ga_users)
+        publications_models_plot,
+        plot_publications_models(references, ref_links)
     ),
     tar_target(
-        users_map,
-        plot_users_map(ga_countries)
+        tools_models_plot,
+        plot_tools_models(tools)
     ),
+    tar_target(
+        word_trends_plot,
+        plot_words_trend(references, sc_stopwords, top_words)
+    ),
+    tar_target(
+        linked_prop_bar,
+        plot_linked_prop(references, ref_links)
+    ),
+    ##====================================================================##
+    ## ---- Supplementary plots ----
+    ##====================================================================##
     tar_target(
         dependencies_plot,
         plot_dependencies(r_dependencies, pypi_dependencies)
@@ -339,30 +362,6 @@ list(
             bg       = "white"
         ),
         format = "file"
-    ),
-    tar_target(
-        publications_models_plot,
-        plot_publications_models(references, ref_links)
-    ),
-    tar_target(
-        tools_models_plot,
-        plot_tools_models(tools)
-    ),
-    tar_target(
-        sc_stopwords,
-        get_sc_stopwords()
-    ),
-    tar_target(
-        top_words,
-        get_top_words()
-    ),
-    tar_target(
-        word_trends_plot,
-        plot_words_trend(references, sc_stopwords, top_words)
-    ),
-    tar_target(
-        linked_prop_bar,
-        plot_linked_prop(references, ref_links)
     ),
     tar_target(
         categories_platforms_plot,
@@ -406,6 +405,34 @@ list(
         ),
         format = "file"
     ),
+    ##====================================================================##
+    ## ---- Other plots ----
+    ##====================================================================##
+    tar_target(
+        sankey,
+        plot_sankey(
+            data   = get_sankey_data(tools),
+            value  = "Count",
+            colour = "Platform",
+            width  = 0.2,
+            space  = 0.05
+        )
+    ),
+    tar_target(
+        landscape_umap,
+        plot_landscape_umap(mfa_data, hcpc, umap)
+    ),
+    tar_target(
+        category_props_plot,
+        plot_category_props(categories, tools)
+    ),
+    tar_target(
+        category_barcodes_plot,
+        plot_category_barcodes(categories, tools)
+    ),
+    ##====================================================================##
+    ## ---- Figures ----
+    ##====================================================================##
     tar_target(
         overview_figure,
         make_overview_figure(
@@ -477,6 +504,29 @@ list(
             res      = 300,
             scaling  = 0.5,
             bg       = "white"
+        ),
+        format = "file"
+    ),
+    ##====================================================================##
+    ## ---- Output ----
+    ##====================================================================##
+    tar_target(
+        save_data,
+        save_data_tables(
+            category_descs    = category_descs,
+            categories_idx    = categories_idx,
+            categories        = categories,
+            references        = references,
+            doi_idx           = doi_idx,
+            ref_links         = ref_links,
+            repositories      = repositories,
+            gh_repos          = gh_repos,
+            tools             = tools,
+            r_dependencies    = r_dependencies,
+            pypi_dependencies = pypi_dependencies,
+            dir               = here("output", "data-tables"),
+            strict            = TRUE,
+            clear             = TRUE
         ),
         format = "file"
     )
