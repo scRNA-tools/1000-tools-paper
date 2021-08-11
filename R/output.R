@@ -61,3 +61,48 @@ save_data_tables <- function(..., dir, strict = FALSE, clear = FALSE) {
     message("Done!")
     invisible(fs::dir_ls(dir))
 }
+
+#' Save model coefficients
+#'
+#' Write model coefficients to a TSV file
+#'
+#' @param models_df data.frame containing tidy model coefficients
+#' @param path Path to TSV file
+#'
+#' @details
+#' Output is a wide table where rows are terms, columns are models and values
+#' are coefficients with confidence intervals
+#'
+#' @return `path` invisibly
+save_model_coefficients <- function(models_df, path) {
+
+    coefs_table <- models_df %>%
+        dplyr::select(Type, Term = term, estimate, conf.low, conf.high) %>%
+        tidyr::pivot_longer(
+            c("estimate", "conf.low", "conf.high"),
+            names_to  = "Estimate",
+            values_to = "Value"
+        ) %>%
+        dplyr::mutate(ValueStr = format(Value, digits = 1, trim = TRUE)) %>%
+        dplyr::select(-Value) %>%
+        tidyr::pivot_wider(
+            id_cols     = c("Type", "Term"),
+            names_from  = "Estimate",
+            values_from = "ValueStr"
+        ) %>%
+        dplyr::mutate(
+            CoefStr = glue::glue("{estimate} ({conf.low}, {conf.high})")
+        ) %>%
+        dplyr::select(Type, Term, CoefStr) %>%
+        tidyr::pivot_wider(names_from = "Type", values_from = "CoefStr")
+
+    dir <- fs::path_dir(path)
+    if (!fs::dir_exists(dir)) {
+        rlang::inform(glue::glue("Creating {dir}..."))
+        fs::dir_create(dir)
+    }
+
+    readr::write_tsv(coefs_table, path)
+
+    invisible(path)
+}

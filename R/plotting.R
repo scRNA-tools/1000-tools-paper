@@ -512,75 +512,13 @@ plot_category_prop_trend <- function(categories, tools) {
         ggplot2::theme(legend.position = "none")
 }
 
-#' Plot publications models
-#'
-#' Plot coefficients for publications models
-#'
-#' @param publications_models list containing publications models
-#'
-#' @return ggplot2 object
-plot_publications_models <- function(publication_models) {
-
-    term_labels <- c(
-        "splines::ns(Years, df = 3)3" = "Years (3rd degree)",
-        "splines::ns(Years, df = 3)2" = "Years (2nd degree)",
-        "splines::ns(Years, df = 3)1" = "Years (1st degree)",
-        "HasPreprintTRUE"             = "Has preprint",
-        "log2(NumAuthors)"            = "log2(Num authors)",
-        "log2(NumReferences + 1)"     = "log2(Num references + 1)"
-    )
-
-    models_df <- tidy_models(
-        publication_models,
-        types = c(
-            citations     = "Citations",
-            altmetric     = "Altmetric"
-        )
-    )
-
-    plot_models(models_df, term_labels)
-}
-
-#' Plot tools models
-#'
-#' Plot coefficients for tools models
-#'
-#' @param tools_models list containing tools models
-#'
-#' @return ggplot2 object
-plot_tools_models <- function(tools_models) {
-
-    term_labels <- c(
-        "(Intercept)"                      = "(Intercept)",
-        "PlatformR"                        = "Platform (R)",
-        "PlatformPython"                   = "Platform (Python)",
-        "PlatformBoth"                     = "Platform (Both)",
-        "HasRepoTRUE"                      = "Has repository",
-        "splines::ns(GHAgeYears, df = 3)3" = "Years (3rd degree)",
-        "splines::ns(GHAgeYears, df = 3)2" = "Years (2nd degree)",
-        "splines::ns(GHAgeYears, df = 3)1" = "Years (1st degree)"
-    )
-
-    models_df <- tidy_models(
-        tools_models,
-        types = c(
-            citations     = "Total citations",
-            altmetric     = "Total altmetric",
-            gh_popularity = "GitHub popularity"
-        )
-    )
-
-    plot_models(models_df, term_labels)
-}
-
 #' Plot models
 #'
 #' @param models_df data.frame containing tidy model coefficients from
 #' `tidy_models()`
-#' @param term_labels Named character vector with labels for coefficient terms
 #'
 #' @return ggplot2 object
-plot_models <- function(models_df, term_labels) {
+plot_models <- function(models_df) {
     # models_df <- models_df %>%
     #     dplyr::mutate(
     #         Label = glue::glue(
@@ -639,7 +577,6 @@ plot_models <- function(models_df, term_labels) {
             stroke   = 1,
             fill     = "white"
         ) +
-        ggplot2::scale_y_discrete(labels = term_labels) +
         ggplot2::scale_colour_brewer(palette = "Set1") +
         ggplot2::scale_shape_manual(values = c(21, 16)) +
         ggplot2::scale_size_manual(values = c(2.2, 3)) +

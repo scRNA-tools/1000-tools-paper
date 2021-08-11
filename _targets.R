@@ -287,8 +287,48 @@ list(
         model_publications(references, ref_links)
     ),
     tar_target(
+        publications_models_df,
+        tidy_models(
+            publications_models,
+            types = c(
+                citations = "Citations",
+                altmetric = "Altmetric"
+            ),
+            term_labels = c(
+                "(Intercept)"                 = "(Intercept)",
+                "log2(NumReferences + 1)"     = "log2(Num references + 1)",
+                "log2(NumAuthors)"            = "log2(Num authors)",
+                "HasPreprintTRUE"             = "Has preprint",
+                "splines::ns(Years, df = 3)3" = "Years (3rd degree)",
+                "splines::ns(Years, df = 3)2" = "Years (2nd degree)",
+                "splines::ns(Years, df = 3)1" = "Years (1st degree)"
+            )
+        )
+    ),
+    tar_target(
         tools_models,
         model_tools(tools)
+    ),
+    tar_target(
+        tools_models_df,
+        tidy_models(
+            tools_models,
+            types = c(
+                citations     = "Total citations",
+                altmetric     = "Total altmetric",
+                gh_popularity = "GitHub popularity"
+            ),
+            term_labels = c(
+                "(Intercept)"                      = "(Intercept)",
+                "PlatformR"                        = "Platform (R)",
+                "PlatformPython"                   = "Platform (Python)",
+                "PlatformBoth"                     = "Platform (Both)",
+                "HasRepoTRUE"                      = "Has repository",
+                "splines::ns(GHAgeYears, df = 3)3" = "Years (3rd degree)",
+                "splines::ns(GHAgeYears, df = 3)2" = "Years (2nd degree)",
+                "splines::ns(GHAgeYears, df = 3)1" = "Years (1st degree)"
+            )
+        )
     ),
     website_analytics,
     ##====================================================================##
@@ -336,11 +376,11 @@ list(
     ),
     tar_target(
         publications_models_plot,
-        plot_publications_models(publications_models)
+        plot_models(publications_models_df)
     ),
     tar_target(
         tools_models_plot,
-        plot_tools_models(tools_models)
+        plot_models(tools_models_df)
     ),
     tar_target(
         word_trends_plot,
@@ -522,20 +562,38 @@ list(
     tar_target(
         save_data,
         save_data_tables(
-            category_descs    = category_descs,
-            categories_idx    = categories_idx,
-            categories        = categories,
-            references        = references,
-            doi_idx           = doi_idx,
-            ref_links         = ref_links,
-            repositories      = repositories,
-            gh_repos          = gh_repos,
-            tools             = tools,
-            r_dependencies    = r_dependencies,
-            pypi_dependencies = pypi_dependencies,
-            dir               = here("output", "data-tables"),
-            strict            = TRUE,
-            clear             = TRUE
+            category_descs      = category_descs,
+            categories_idx      = categories_idx,
+            categories          = categories,
+            references          = references,
+            doi_idx             = doi_idx,
+            ref_links           = ref_links,
+            repositories        = repositories,
+            gh_repos            = gh_repos,
+            tools               = tools,
+            r_dependencies      = r_dependencies,
+            pypi_dependencies   = pypi_dependencies,
+            publications_models = publications_models_df,
+            tools_models        = tools_models_df,
+            dir                 = here("output", "data-tables"),
+            strict              = TRUE,
+            clear               = TRUE
+        ),
+        format = "file"
+    ),
+    tar_target(
+        publications_models_tsv,
+        save_model_coefficients(
+            publications_models_df,
+            here("output", "tables", "publications-models.tsv")
+        ),
+        format = "file"
+    ),
+    tar_target(
+        tools_models_tsv,
+        save_model_coefficients(
+            tools_models_df,
+            here("output", "tables", "tools-models.tsv")
         ),
         format = "file"
     )

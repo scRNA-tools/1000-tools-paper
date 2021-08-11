@@ -133,12 +133,13 @@ model_tools <- function(tools) {
 #' @param models Named list of lm model objects
 #' @param types Named vector of types (i.e. the predicted variable) for each
 #' model. Must include items for all the names in `models`.
+#' @param term_labels Named vector containing labels for terms
 #'
 #' @details
 #' Tidy output comes from `ggstatsplot::ggcoefstats(..., output = "tidy")`
 #'
 #' @return tibble containing tidy model coefficients
-tidy_models <- function(models, types) {
+tidy_models <- function(models, types, term_labels) {
 
     if (!all(names(models) %in% names(types))) {
         rlang::abort(paste0(
@@ -154,5 +155,12 @@ tidy_models <- function(models, types) {
         ggstatsplot::ggcoefstats(models[[.model]], output = "tidy") %>%
             dplyr::mutate(Type = types[.model])
     }) %>%
-        dplyr::mutate(Type = factor(Type, levels = types))
+        dplyr::mutate(
+            Type = factor(Type, levels = types),
+            term = factor(
+                term,
+                levels = names(term_labels),
+                labels = term_labels
+            )
+        )
 }
