@@ -1,6 +1,7 @@
 # 1000 tools paper
 
 <!-- badges: start -->
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
 This repository contains code and analysis for the _"Over 1000 tools reveal trends in the single-cell RNA-seq analysis landscape"_ publication.
@@ -110,3 +111,7 @@ tar_target(
     "YYYY-MM-DD"
 )
 ```
+
+## License
+
+The code is available under the [MIT](https://github.com/scRNA-tools/1000-tools/blob/master/LICENSE.md) license.
