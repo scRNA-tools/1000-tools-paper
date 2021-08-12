@@ -218,14 +218,16 @@ plot_platforms_over_time <- function(tools) {
 #' Plot publication delay
 #'
 #' Create a scatter plot of days until publication against preprint date for
-#' papers with a linked preprint. Right side shows boxplot and density plot of
-#' publication delay.
+#' papers with a linked preprint. Right side shows a box plot and density plot
+#' of publication delay.
 #'
 #' @param ref_links data.frame containing reference links
 #' @param references data.frame containing references data
 #'
 #' @return ggplot object
 plot_publication_delay <- function(ref_links, references) {
+
+    extrafont::loadfonts(quiet = TRUE)
 
     delays <- ref_links %>%
         dplyr::filter(Correct) %>%
