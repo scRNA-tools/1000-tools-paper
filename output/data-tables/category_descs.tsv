@@ -1,0 +1,43 @@
+Category	Phase	Description
+Alignment	"Data
+acquisition"	Alignment of sequencing reads to a reference
+Assembly	"Data
+acquisition"	Tools that perform assembly of scRNA-seq reads
+UMIs	"Data
+acquisition"	Processing of Unique Molecular Identifiers
+Quantification	"Data
+acquisition"	Quantification of expression from reads
+QualityControl	Data cleaning	Removal of low-quality cells
+GeneFiltering	Data cleaning	Removal of lowly expressed or otherwise uninformative genes
+Imputation	Data cleaning	Estimation of expression where zeros have been observed
+Normalisation	Data cleaning	Removal of unwanted variation that may affect results
+CellCycle	Data cleaning	Assignment or correction of stages of the cell cycle, or other uses of cell cycle genes, or genes associated with similar processes
+Classification	Cell assignment	Assignment of cell types based on a reference dataset
+Clustering	Cell assignment	Unsupervised grouping of cells based on expression profiles
+Ordering	Cell assignment	Ordering of cells along a trajectory
+RareCells	Cell assignment	Identification of rare cell populations
+StemCells	Cell assignment	Identification of cells with stem-like characteristics
+DifferentialExpression	"Gene
+identification"	Testing of differential expression across groups of cells
+ExpressionPatterns	"Gene
+identification"	Detection of genes that change expression across a trajectory
+GeneNetworks	"Gene
+identification"	Identification or use of co-regulated gene networks
+GeneSets	"Gene
+identification"	Testing for over representation or other uses of annotated gene sets
+MarkerGenes	"Gene
+identification"	Identification or use of genes that mark cell populations
+DimensionalityReduction	Multiple	Projection of cells into a lower dimensional space
+Interactive	Multiple	Tools with an interactive component or a graphical user interface
+VariableGenes	Multiple	Identifcation or use of highly (or lowly) variable genes
+Visualisation	Multiple	Functions for visualising some aspect of scRNA-seq data or analysis
+AlleleSpecific	Other	Detection of allele-specific expression
+AlternativeSplicing	Other	Detection of alternative splicing
+Haplotypes	Other	Use or assignment of haplotypes
+Immune	Other	Assignment of receptor sequences and immune cell clonality
+Integration	Data cleaning	Combining of scRNA-seq datasets or integration with other single-cell data types
+Modality	Other	Identification or use of modality in gene expression
+Simulation	Other	Generation of synthetic scRNA-seq datasets
+Transformation	Other	Transformation between expression levels and some other measure
+Variants	Other	Detection or use of nucleotide variants
+Perturbations	Other	Analysis of induced perturbations such as drug effects
