@@ -120,6 +120,11 @@ targets::tar_make()
 
 Some of the steps (collecting reference and GitHub repository information) take a while to run.
 Once the workflow is complete various output files will be created in the `output/` directory.
+If you want to view any of the intermediate parts of the workflow you can load the output of any target using:
+
+```r
+targets::tar_load(target_name)
+```
 
 ### Updating analysis
 
