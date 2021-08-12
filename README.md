@@ -7,6 +7,27 @@
 
 This repository contains code and analysis for the _"Over 1000 tools reveal trends in the single-cell RNA-seq analysis landscape"_ publication.
 
+## Directory structure
+
+* `R/` - Folder containing R code files. See documentation in files for more detail.
+* `output/` - Output files created by the workflow. These versions are stored here as a record but will be overwritten by running the workflow.
+  * `data-tables/` - Data files created by the workflow
+  * `figures/` - Figures shown in the paper
+  * `supplementary/` - Supplementary figures shown in the paper
+  * `tables/` - Tables shown in the paper
+* `.gitignore` - Git configuration file
+* `1000-tools.Rproj` - RStudio project file
+* `LICENSE.md` - License file
+* `README.md` - This README file
+* `renv/` - Internal **{renv}** files
+* `renv.lock` - **{renv}** lock file specifying R package dependencies
+
+### Other files created by set up or the workflow
+
+* `.Renviron` - Local R configuration file, created as part of setting up
+* `_cache/` - Cache files created by the workflow to speed up some parts of the analysis
+* `_targets/` - Internal **{targets}** files
+
 ## Setting up
 
 ### R Dependencies
