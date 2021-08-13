@@ -1,6 +1,7 @@
 # 1000 tools paper
 
 <!-- badges: start -->
+[![DOI](https://zenodo.org/badge/395258982.svg)](https://zenodo.org/badge/latestdoi/395258982)
 [![gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg?style=flat-square)](https://gitmoji.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
