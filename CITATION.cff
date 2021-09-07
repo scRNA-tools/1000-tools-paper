@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use any of the code in this repository or analysis in the publication please cite as below."
+authors:
+- family-names: "Zappia"
+  given-names: "Luke"
+  orcid: "https://orcid.org/0000-0001-7744-8565"
+- family-names: "Theis"
+  given-names: "Fabian J"
+  orcid: "https://orcid.org/0000-0002-2419-1943"
+title: "1000 tools paper"
+url: "https://github.com/scRNA-tools/1000-tools-paper"
+preferred-citation:
+  type: unpublished
+  authors:
+  - family-names: "Zappia"
+    given-names: "Luke"
+    orcid: "https://orcid.org/0000-0001-7744-8565"
+  - family-names: "Theis"
+    given-names: "Fabian J"
+    orcid: "https://orcid.org/0000-0002-2419-1943"
+  doi: "10.1101/2021.08.13.456196"
+  journal: "bioRxiv"
+  month: 8
+  title: "Over 1000 tools reveal trends in the single-cell {RNA-seq} analysis landscape"
+  year: 2021
