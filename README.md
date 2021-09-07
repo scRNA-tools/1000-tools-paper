@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-This repository contains code and analysis for the _"Over 1000 tools reveal trends in the single-cell RNA-seq analysis landscape"_ publication.
+This repository contains code and analysis for the [_"Over 1000 tools reveal trends in the single-cell RNA-seq analysis landscape"_](https://doi.org/10.1101/2021.08.13.456196) publication.
 
 ## Directory structure
 
@@ -143,3 +143,27 @@ tar_target(
 ## License
 
 The code is available under the [MIT](https://github.com/scRNA-tools/1000-tools/blob/master/LICENSE.md) license.
+
+## Citation
+
+If you use any of the code in this repository or analysis in the publication please cite:
+
+> Zappia L, Theis FJ. _"Over 1000 tools reveal trends in the single-cell RNA-seq
+> analysis landscape"_, **bioRxiv** (2021),
+> DOI: [10.1101/2021.08.13.456196](https://doi.org/10.1101/2021.08.13.456196)
+
+```bibtex
+
+@UNPUBLISHED{,
+  title    = "Over 1000 tools reveal trends in the single-cell {RNA-seq}
+              analysis landscape",
+  author   = "Zappia, Luke and Theis, Fabian J",
+  journal  = "bioRxiv",
+  pages    = "2021.08.13.456196",
+  month    =  aug,
+  year     =  2021,
+  language = "en",
+  doi      = "10.1101/2021.08.13.456196",
+  url      = "https://doi.org/10.1101/2021.08.13.456196"
+}
+```
