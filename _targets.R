@@ -454,6 +454,27 @@ list(
         ),
         format = "file"
     ),
+    tar_target(
+        add_delay_plot,
+        plot_add_delay(tools, references, doi_idx)
+    ),
+    tar_target(
+        add_delay_png,
+        ggplot2::ggsave(
+            plot     = add_delay_plot,
+            filename = here(
+                "output", "supplementary", "add_delay.png"
+            ),
+            device   = ragg::agg_png,
+            width    = 20,
+            height   = 12,
+            units    = "cm",
+            res      = 300,
+            scaling  = 0.8,
+            bg       = "white"
+        ),
+        format = "file"
+    ),
     ##====================================================================##
     ## ---- Other plots ----
     ##====================================================================##
