@@ -314,16 +314,20 @@ list(
         tidy_models(
             tools_models,
             types = c(
-                citations     = "Total citations",
-                altmetric     = "Total altmetric",
-                gh_popularity = "GitHub popularity"
+                citations = "Total citations",
+                altmetric = "Total altmetric",
+                gh_stars  = "GitHub stars"
             ),
             term_labels = c(
                 "(Intercept)"                      = "(Intercept)",
+                "GHContributors"                   = "GitHub contributors",
+                "HasRepoTRUE"                      = "Has repository",
+                "HasLicenseTRUE"                   = "Has license",
                 "PlatformR"                        = "Platform (R)",
                 "PlatformPython"                   = "Platform (Python)",
                 "PlatformBoth"                     = "Platform (Both)",
-                "HasRepoTRUE"                      = "Has repository",
+                "Preprints"                        = "Preprints",
+                "Publications"                     = "Publications",
                 "splines::ns(GHAgeYears, df = 3)3" = "Years (3rd degree)",
                 "splines::ns(GHAgeYears, df = 3)2" = "Years (2nd degree)",
                 "splines::ns(GHAgeYears, df = 3)1" = "Years (1st degree)"

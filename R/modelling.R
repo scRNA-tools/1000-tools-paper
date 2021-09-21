@@ -81,8 +81,8 @@ model_tools <- function(tools) {
                 PlatformPy             ~ "Python",
                 TRUE                   ~ "Other"
             ),
-            HasRepo       = Bioc | CRAN | PyPI,
-            GHPopularity  = GHPopularity / log10(2) # Change to log base 2
+            HasRepo    = Bioc | CRAN | PyPI,
+            HasLicense = !is.na(License)
         ) %>%
         dplyr::mutate(
             Platform = factor(
@@ -90,39 +90,56 @@ model_tools <- function(tools) {
                 levels = c("Other", "R", "Python", "Both")
             )
         ) %>%
+        dplyr::filter(
+            !is.na(TotalCitations),
+            !is.na(TotalAltmetric),
+            !is.na(GHStars)
+        ) %>%
         dplyr::select(
-            Platform, HasRepo, GHAgeYears, TotalCitations, TotalAltmetric,
-            GHPopularity
+            TotalCitations, TotalAltmetric, GHStars, GHAgeYears, Platform,
+            HasRepo, HasLicense, Publications, Preprints, GHContributors
         )
 
     citations_model <- lm(
         log2(TotalCitations + 1) ~
+            splines::ns(GHAgeYears, df = 3) +
             Platform +
             HasRepo +
-            splines::ns(GHAgeYears, df = 3),
-        data = dplyr::filter(model_data, !is.na(TotalCitations))
+            HasLicense +
+            Publications +
+            Preprints +
+            GHContributors,
+        data = model_data
     )
 
     altmetric_model <- lm(
         log2(TotalAltmetric + 1) ~
+            splines::ns(GHAgeYears, df = 3) +
             Platform +
             HasRepo +
-            splines::ns(GHAgeYears, df = 3),
-        data = dplyr::filter(model_data, !is.na(TotalAltmetric))
+            HasLicense +
+            Publications +
+            Preprints +
+            GHContributors,
+        data = model_data
     )
 
-    popularity_model <- lm(
-        GHPopularity ~
+    stars_model <- lm(
+        log2(GHStars + 1) ~
+            splines::ns(GHAgeYears, df = 3) +
             Platform +
             HasRepo +
-            splines::ns(GHAgeYears, df = 3),
-        data = dplyr::filter(model_data, !is.na(GHPopularity))
+            HasLicense +
+            Publications +
+            Preprints +
+            GHContributors,
+        data = model_data
     )
 
     list(
-        citations     = citations_model,
-        altmetric     = altmetric_model,
-        gh_popularity = popularity_model
+        citations = citations_model,
+        altmetric = altmetric_model,
+        gh_stars  = stars_model
     )
 }
 
