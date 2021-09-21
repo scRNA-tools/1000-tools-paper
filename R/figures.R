@@ -112,6 +112,7 @@ make_open_figure <- function(linked_prop_bar, delay_plot, gh_stats_plot,
             nrow   = 1,
             labels = c("D", "E")
         ),
-        nrow = 2
+        nrow = 2,
+        rel_heights = c(1, 1.2)
     )
 }

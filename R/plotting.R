@@ -516,11 +516,16 @@ plot_category_prop_trend <- function(categories, tools) {
 
 #' Plot models
 #'
+#' Plot coefficients for a set of linear models. Adjusted R-squared values are
+#' shown in an inset plot.
+#'
 #' @param models_df data.frame containing tidy model coefficients from
 #' `tidy_models()`
+#' @param models_fits data.frame containing goodness-of-fit statistics for each
+#' model from `tidy_models_fits()`
 #'
 #' @return ggplot2 object
-plot_models <- function(models_df) {
+plot_models <- function(models_df, models_fits) {
     # models_df <- models_df %>%
     #     dplyr::mutate(
     #         Label = glue::glue(
@@ -552,7 +557,7 @@ plot_models <- function(models_df) {
     #     show.legend        = FALSE
     # ) +
 
-    ggplot2::ggplot(
+    coefficients_plot <- ggplot2::ggplot(
         models_df,
         ggplot2::aes(
             x      = estimate,
@@ -590,6 +595,55 @@ plot_models <- function(models_df) {
             legend.box      = "vertical",
             legend.margin   = ggplot2::margin(t = -8)
         )
+
+    models_fits <- models_fits %>%
+        dplyr::mutate(
+            AdjRSquaredStr = format(AdjRSquared, digits = 3),
+            Label          = glue::glue("**{Type}**<br/>{AdjRSquaredStr}")
+        )
+
+    fits_plot <- ggplot2::ggplot(
+        models_fits,
+        ggplot2::aes(x = AdjRSquared, y = forcats::fct_rev(Type), fill = Type)
+    ) +
+        ggplot2::geom_col() +
+        ggplot2::geom_col(
+            ggplot2::aes(x = 1),
+            colour = "grey30",
+            size   = 1,
+            alpha  = 0
+        ) +
+        ggtext::geom_richtext(
+            ggplot2::aes(
+                label = Label, #format(AdjRSquared, digits = 3),
+                colour = Type
+            ),
+            hjust        = 0,
+            fill         = NA,
+            label.colour = NA,
+            size         = 3,
+            family       = "Noto Sans"
+        ) +
+        ggplot2::scale_fill_brewer(palette = "Set1") +
+        ggplot2::scale_colour_brewer(palette = "Set1") +
+        ggplot2::labs(title = "Adjusted R<sup>2</sup>") +
+        ggplot2::theme_void(base_family = "Noto Sans", base_size = 16) +
+        ggplot2::theme(
+            plot.title      = ggtext::element_markdown(
+                hjust = 0.5,
+                size = ggplot2::rel(0.6)
+            ),
+            legend.position = "none",
+            plot.background = ggplot2::element_rect(size = 1, colour = "grey60")
+        )
+
+    coefficients_plot + patchwork::inset_element(
+        fits_plot,
+        left   = 0.50,
+        bottom = 0.05,
+        right  = 0.95,
+        top    = 0.08 + 0.1 * nrow(models_fits)
+    )
 }
 
 #' Plot platforms bar

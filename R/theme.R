@@ -34,7 +34,7 @@ theme_1000 <- function(base_size = 11, base_family = "Noto Sans",
     if (border) {
         theme <- theme + ggplot2::theme(
             panel.border = ggplot2::element_rect(
-                colour = "grey30",
+                colour = border_col,
                 fill   = "NA"
             )
         )

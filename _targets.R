@@ -401,11 +401,11 @@ list(
     ),
     tar_target(
         publications_models_plot,
-        plot_models(publications_models_df)
+        plot_models(publications_models_df, publications_models_fits)
     ),
     tar_target(
         tools_models_plot,
-        plot_models(tools_models_df)
+        plot_models(tools_models_df, tools_models_fits)
     ),
     tar_target(
         word_trends_plot,
@@ -594,7 +594,7 @@ list(
             filename = here("output", "figures", "open.png"),
             device   = ragg::agg_png,
             width    = 20,
-            height   = 16,
+            height   = 18,
             units    = "cm",
             res      = 300,
             scaling  = 0.5,
