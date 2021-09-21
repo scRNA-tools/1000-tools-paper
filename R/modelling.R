@@ -158,15 +158,7 @@ model_tools <- function(tools) {
 #' @return tibble containing tidy model coefficients
 tidy_models <- function(models, types, term_labels) {
 
-    if (!all(names(models) %in% names(types))) {
-        rlang::abort(paste0(
-            "Some models do not have a matching type: ",
-            paste(
-                names(models)[!(names(models) %in% names(types))],
-                collapse = ", "
-            )
-        ))
-    }
+    abort_models_types(names(models), types)
 
     purrr::map_dfr(names(models), function(.model) {
         ggstatsplot::ggcoefstats(models[[.model]], output = "tidy") %>%
@@ -180,4 +172,51 @@ tidy_models <- function(models, types, term_labels) {
                 labels = term_labels
             )
         )
+}
+
+#' Tidy models fits
+#'
+#' Tidy the fits for a set of linear models
+#'
+#' @param models Named list of lm model objects
+#' @param types Named vector of types (i.e. the predicted variable) for each
+#' model. Must include items for all the names in `models`.
+#'
+#' @return tibble containing tidy model fits
+tidy_models_fits <- function(models, types) {
+
+    abort_models_types(names(models), types)
+
+    purrr::map_dfr(names(models), function(.model) {
+        model_summ <- summary(models[[.model]])
+        tibble::tibble(
+            Type        = types[.model],
+            RSquared    = model_summ$r.squared,
+            AdjRSquared = model_summ$adj.r.squared
+        )
+    }) %>%
+        dplyr::mutate(Type = factor(Type, levels = types))
+}
+
+#' Abort models types
+#'
+#' Raise an error if model types do not match model names
+#'
+#' @param model_names Vector of model names
+#' @param types Named vector of types (i.e. the predicted variable) for each
+#' model
+#'
+#' @return `TRUE` invisibly
+abort_models_types <- function(model_names, types) {
+    if (!all(model_names %in% names(types))) {
+        rlang::abort(paste0(
+            "Some models do not have a matching type: ",
+            paste(
+                model_names[!(model_names %in% names(types))],
+                collapse = ", "
+            )
+        ))
+    }
+
+    invisible(TRUE)
 }

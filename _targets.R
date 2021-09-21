@@ -306,6 +306,16 @@ list(
         )
     ),
     tar_target(
+        publications_models_fits,
+        tidy_models_fits(
+            publications_models,
+            types = c(
+                citations = "Citations",
+                altmetric = "Altmetric"
+            )
+        )
+    ),
+    tar_target(
         tools_models,
         model_tools(tools)
     ),
@@ -331,6 +341,17 @@ list(
                 "splines::ns(GHAgeYears, df = 3)3" = "Years (3rd degree)",
                 "splines::ns(GHAgeYears, df = 3)2" = "Years (2nd degree)",
                 "splines::ns(GHAgeYears, df = 3)1" = "Years (1st degree)"
+            )
+        )
+    ),
+    tar_target(
+        tools_models_fits,
+        tidy_models_fits(
+            tools_models,
+            types = c(
+                citations = "Total citations",
+                altmetric = "Total altmetric",
+                gh_stars  = "GitHub stars"
             )
         )
     ),
@@ -599,7 +620,9 @@ list(
             r_dependencies      = r_dependencies,
             pypi_dependencies   = pypi_dependencies,
             publications_models = publications_models_df,
+            publications_fits   = publications_models_fits,
             tools_models        = tools_models_df,
+            tools_fits          = tools_models_fits,
             dir                 = here("output", "data-tables"),
             strict              = TRUE,
             clear               = TRUE
