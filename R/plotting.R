@@ -1136,3 +1136,110 @@ plot_linked_prop <- function(references, ref_links) {
             axis.line.x     = ggplot2::element_blank()
         )
 }
+
+#' Plot word clouds
+#'
+#' Plot word clouds for abstracts over time
+#'
+#' @param references data.frame containing references data
+#' @param sc_stopwords data.frame with column containing single-cell stopwords
+#'
+#' @return ggplot object
+plot_wordclouds <- function(references, sc_stopwords) {
+
+    ref_years <- references %>%
+        dplyr::filter(!is.na(Abstract)) %>%
+        dplyr::mutate(Year = lubridate::year(Date)) %>%
+        dplyr::mutate(Year = dplyr::if_else(Year <= 2017, 2017, Year)) %>%
+        dplyr::group_by(Year) %>%
+        dplyr::count(name = "YearCount")
+
+    word_years <- references %>%
+        dplyr::mutate(Year = lubridate::year(Date)) %>%
+        dplyr::mutate(Year = dplyr::if_else(Year <= 2017, 2017, Year)) %>%
+        dplyr::select(DOI, Year, Abstract) %>%
+        dplyr::filter(!is.na(Abstract)) %>%
+        dplyr::mutate(
+            Abstract = stringr::str_remove_all(Abstract, "\\S*https?:\\S*"),
+            Abstract = stringr::str_remove_all(
+                Abstract,
+                "\\b-?[0-9]\\d*(\\.\\d+)?\\b"
+            )
+        ) %>%
+        tidytext::unnest_tokens(Word, Abstract) %>%
+        dplyr::anti_join(tidytext::stop_words, by = c("Word" = "word")) %>%
+        dplyr::anti_join(sc_stopwords, by = c("Word" = "word")) %>%
+        dplyr::distinct() %>%
+        dplyr::group_by(Year, Word) %>%
+        dplyr::count(name = "Count") %>%
+        dplyr::group_by(Word) %>%
+        dplyr::filter(sum(Count) > 10) %>%
+        dplyr::left_join(ref_years, by = "Year") %>%
+        dplyr::mutate(Prop = Count / YearCount) %>%
+        dplyr::group_by(Word) %>%
+        dplyr::arrange(Year) %>%
+        dplyr::mutate(Change = Prop - dplyr::lag(Prop)) %>%
+        dplyr::filter(Year > 2017) %>%
+        dplyr::group_by(Year) %>%
+        dplyr::slice_max(abs(Change), n = 20) %>%
+        dplyr::arrange(dplyr::desc(Count)) %>%
+        dplyr::mutate(
+            Angle = 90 * sample(
+                c(0, 1),
+                dplyr::n(),
+                replace = TRUE,
+                prob = c(80, 20)
+            )
+        ) %>%
+        dplyr::ungroup()
+
+    withr::with_seed(1, {
+        word_years <- word_years %>%
+            dplyr::group_by(Year) %>%
+            dplyr::mutate(
+                Angle = 90 * sample(
+                    c(0, 1),
+                    dplyr::n(),
+                    replace = TRUE,
+                    prob = c(60, 40)
+                )
+            ) %>%
+            dplyr::ungroup()
+    })
+
+    ggplot2::ggplot(
+        word_years,
+        ggplot2::aes(
+            label  = Word,
+            size   = Prop,
+            angle  = Angle,
+            colour = Change
+        )
+    ) +
+        ggwordcloud::geom_text_wordcloud(
+            shape       = "square",
+            family      = "Noto Sans",
+            grid_margin = 0,
+            grid_size   = 0,
+            show.legend = TRUE,
+            seed        = 1
+        ) +
+        ggplot2::scale_radius(
+            range  = c(2, 6),
+            limits = c(min(word_years$Prop), NA),
+            guide  = "none"
+        ) +
+        ggplot2::scale_colour_gradientn(
+            colours = c("#4d9221", "grey90", "#c51b7d"),
+            limits  = c(
+                -max(abs(word_years$Change)),
+                max(abs(word_years$Change))
+            )
+        ) +
+        ggplot2::facet_wrap(~ Year, nrow = 1) +
+        ggplot2::theme_minimal(base_family = "Noto Sans", base_size = 16) +
+        ggplot2::theme(
+            strip.text   = ggplot2::element_text(size = 16, face = "bold"),
+            panel.margin = grid::unit(2, "lines")
+        )
+}

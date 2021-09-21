@@ -59,10 +59,11 @@ make_overview_figure <- function(platforms_bar_plot, repositories_bar_plot,
 #' @param platforms_time_plot ggplot object with platforms over time plot
 #' @param category_trend_plot ggplot object with categories trends plot
 #' @param word_trends_plot ggplot object with abstract words trends plot
+#' @param wordclouds_plot ggplot object with abstract wordclouds plot
 #'
 #' @return assembled ggplot object
 make_trends_figure <- function(platforms_time_plot, category_trend_plot,
-                               word_trends_plot) {
+                               word_trends_plot, wordclouds_plot) {
 
     extrafont::loadfonts(quiet = TRUE)
 
@@ -75,8 +76,10 @@ make_trends_figure <- function(platforms_time_plot, category_trend_plot,
             labels     = c("A", "B")
         ),
         word_trends_plot,
-        nrow = 2,
-        labels = c("", "C")
+        wordclouds_plot,
+        nrow        = 3,
+        rel_heights = c(1, 1, 0.5),
+        labels      = c("", "C", "D")
     )
 }
 

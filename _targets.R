@@ -412,6 +412,10 @@ list(
         plot_words_trend(references, sc_stopwords, top_words)
     ),
     tar_target(
+        wordclouds_plot,
+        plot_wordclouds(references, sc_stopwords)
+    ),
+    tar_target(
         linked_prop_bar,
         plot_linked_prop(references, ref_links)
     ),
@@ -559,7 +563,8 @@ list(
         make_trends_figure(
             platforms_time_plot,
             category_trend_plot,
-            word_trends_plot
+            word_trends_plot,
+            wordclouds_plot
         )
     ),
     tar_target(
@@ -569,7 +574,7 @@ list(
             filename = here("output", "figures", "trends.png"),
             device   = ragg::agg_png,
             width    = 20,
-            height   = 14,
+            height   = 16,
             units    = "cm",
             res      = 300,
             scaling  = 0.5,
