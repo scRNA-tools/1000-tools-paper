@@ -426,3 +426,343 @@ plot_add_delay <- function(tools, references, doi_idx) {
         axis       = c("tb")
     )
 }
+
+#' Plot metric correlations
+#'
+#' Plot the correlation between metrics for publications and tools
+#'
+#' @param references data.frame containing references data
+#' @param references data.frame containing tools data
+#'
+#' @return assembled ggplot2 object
+plot_metric_correlations <- function(references, tools) {
+
+    extrafont::loadfonts(quiet = TRUE)
+    cowplot::set_null_device("agg")
+
+    publications <- plot_publications_correlation(references)
+    tools <- plot_tools_correlation(tools)
+
+    cowplot::plot_grid(
+        publications,
+        tools,
+        nrow        = 2,
+        rel_heights = c(0.7, 1)
+    )
+}
+
+#' Plot publications correlation
+#'
+#' Plot the correlation between citations and Altmetric attention score for
+#' publications
+#'
+#' @param references data.frame containing references data
+#'
+#' @return ggplot2 object
+plot_publications_correlation <- function(references) {
+
+    extrafont::loadfonts(quiet = TRUE)
+
+    plot_data <- references %>%
+        dplyr::filter(
+            !Preprint,
+            Years > 0
+        ) %>%
+        dplyr::mutate(
+            LogCitations = log10(Citations + 1),
+            LogAltmetric = log10(Altmetric + 1)
+        ) %>%
+        dplyr::mutate(
+            LogAltmetric = dplyr::if_else(
+                is.na(LogAltmetric),
+                -Inf,
+                LogAltmetric
+            )
+        ) %>%
+        dplyr::select(Citations, Altmetric, LogCitations, LogAltmetric, Years)
+
+    fit <- lm(
+        LogAltmetric ~ LogCitations,
+        data = dplyr::filter(plot_data, is.finite(LogAltmetric))
+    )
+    int_str <- format(
+        fit$coefficients[1],
+        digits     = 2,
+        nsmall     = 2,
+        scientific = FALSE,
+        trim       = FALSE
+    )
+    slope_str <- format(
+        fit$coefficients[2],
+        digits     = 2,
+        scientific = FALSE,
+        trim       = TRUE
+    )
+
+    rho <- cor(
+        plot_data$LogCitations, plot_data$LogAltmetric,
+        method = "spearman",
+        use    = "complete.obs"
+    )
+    rho_str <- format(
+        rho,
+        digits     = 2,
+        scientific = FALSE,
+        trim       = TRUE
+    )
+
+    ggplot2::ggplot(
+        plot_data,
+        ggplot2::aes(x = LogCitations, y = LogAltmetric, colour = Years)
+    ) +
+        ggplot2::geom_abline(
+            slope    = 1,
+            linetype = "dashed",
+            colour   = "#f781bf",
+            size     = 1
+        ) +
+        ggplot2::geom_point() +
+        ggplot2::geom_smooth(
+            method  = "lm",
+            formula = "y ~ x",
+            colour  = "#4daf4a",
+            fill    = "#4daf4a",
+            alpha   = 0.2
+        ) +
+        withr::with_package("ggtext", {
+            ggplot2::annotate(
+                "richtext",
+                x = 3.0, y = 0.5,
+                label = glue::glue(
+                    "Spearman's &rho; = {rho_str}",
+                    "<br/>",
+                    "y = {int_str} + {slope_str}x"
+                ),
+                size         = 4,
+                hjust        = 0,
+                fill         = NA,
+                label.colour = NA,
+                lineheight   = 1.5,
+                family       = "Noto Sans Math"
+            )
+        }) +
+        ggplot2::scale_colour_viridis_c(
+            option = "plasma",
+            name   = "Age<br/>(years)"
+        ) +
+        ggplot2::labs(
+            title = "Publications metrics correlations",
+            x     = "log<sub>10</sub>(Citations + 1)",
+            y     = "log<sub>10</sub>(Altmetric attention score + 1)"
+        ) +
+        ggplot2::guides(
+            colour = ggplot2::guide_colourbar(
+                barheight = 15
+            )
+        ) +
+        theme_1000(base_size = 16) +
+        ggplot2::theme(
+            axis.title.x        = ggtext::element_markdown(size = 10),
+            axis.title.y        = ggtext::element_markdown(size = 10),
+            legend.title        = ggtext::element_markdown(),
+            plot.title.position = "plot"
+        )
+}
+
+#' Plot tools correlation
+#'
+#' Plot the correlation between citations, Altmetric attention score and
+#' GitHub stars for tools
+#'
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot2 object
+plot_tools_correlation <- function(tools) {
+
+    plot_data <- tools %>%
+        dplyr::mutate(
+            LogTotalCitations = log10(TotalCitations + 1),
+            LogTotalAltmetric = log10(TotalAltmetric + 1),
+            LogGHStars        = log10(GHStars + 1)
+        ) %>%
+        dplyr::mutate(
+            LogTotalCitations = dplyr::if_else(
+                is.na(LogTotalCitations),
+                -Inf,
+                LogTotalCitations
+            ),
+            LogTotalAltmetric = dplyr::if_else(
+                is.na(LogTotalAltmetric),
+                -Inf,
+                LogTotalAltmetric
+            ),
+            LogGHStars = dplyr::if_else(
+                is.na(LogGHStars),
+                -Inf,
+                LogGHStars
+            )
+        ) %>%
+        dplyr::select(
+            TotalCitations, TotalAltmetric, GHStars, LogTotalCitations,
+            LogTotalAltmetric, LogGHStars, GHAgeYears
+        )
+
+    plot_data_long <- purrr::map2_dfr(
+        .x = c("LogTotalCitations", "LogTotalCitations", "LogTotalAltmetric"),
+        .y = c("LogTotalAltmetric", "LogGHStars", "LogGHStars"),
+        function(.x, .y) {
+            tibble::tibble(
+                Comparison = glue::glue("{.x}VS{.y}"),
+                XType      = .x,
+                XValue     = plot_data[[.x]],
+                YType      = .y,
+                YValue     = plot_data[[.y]],
+                GHAgeYears = plot_data$GHAgeYears
+            )
+        }
+    ) %>%
+        dplyr::mutate(
+            XType = factor(
+                XType,
+                levels = c("LogTotalCitations", "LogTotalAltmetric"),
+                labels = c(
+                    "log<sub>10</sub>(Total citations + 1)",
+                    "log<sub>10</sub>(Total Altmetric attention score + 1)"
+                )
+            ),
+            YType = factor(
+                YType,
+                levels = c("LogTotalAltmetric", "LogGHStars"),
+                labels = c(
+                    "log<sub>10</sub>(Total Altmetric attention score + 1)",
+                    "log<sub>10</sub>(GitHub stars + 1)"
+                )
+            )
+        )
+
+    fits <- plot_data_long %>%
+        dplyr::group_by(XType, YType) %>%
+        tidyr::nest() %>%
+        dplyr::mutate(
+            model = purrr::map(
+                data,
+                ~ lm(
+                    YValue ~ XValue,
+                    data = dplyr::filter(
+                        .x,
+                        is.finite(XValue),
+                        is.finite(YValue)
+                    )
+                )
+            ),
+            Rho = purrr::map_dbl(
+                data,
+                ~ cor(
+                    .x$XValue, .x$YValue,
+                    method = "spearman",
+                    use    = "complete.obs"
+                )
+            )
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(
+            Intercept = purrr::map_dbl(model, ~ .x$coefficients[1]),
+            Slope     = purrr::map_dbl(model, ~ .x$coefficients[2]),
+            IntStr    = format(
+                Intercept,
+                digits     = 2,
+                nsmall     = 2,
+                scientific = FALSE,
+                trim       = FALSE
+            ),
+            SlopeStr  = format(
+                Slope,
+                digits     = 2,
+                scientific = FALSE,
+                trim       = TRUE
+            ),
+        ) %>%
+        dplyr::mutate(
+            RhoStr = format(
+                Rho,
+                digits     = 2,
+                scientific = FALSE,
+                trim       = TRUE
+            )
+        ) %>%
+        dplyr::mutate(
+            Label = glue::glue(
+                "Spearman's &rho; = {RhoStr}",
+                "<br/>",
+                "y = {IntStr} + {SlopeStr}x"
+            )
+        )
+
+    plot <- ggplot2::ggplot(
+        plot_data_long,
+        ggplot2::aes(x = XValue, y = YValue)
+    ) +
+        ggplot2::geom_abline(
+            slope    = 1,
+            linetype = "dashed",
+            colour   = "#f781bf",
+            size     = 1
+        ) +
+        ggplot2::geom_point(ggplot2::aes(colour = GHAgeYears)) +
+        ggplot2::geom_smooth(
+            method  = "lm",
+            formula = "y ~ x",
+            colour  = "#4daf4a",
+            fill    = "#4daf4a",
+            alpha   = 0.2
+        ) +
+        ggtext::geom_richtext(
+            data = fits,
+            ggplot2::aes(label = Label),
+            x = 2.8, y = 0.5,
+            size         = 3,
+            hjust        = 0,
+            fill         = NA,
+            label.colour = NA,
+            lineheight   = 1.5,
+            family       = "Noto Sans Math"
+        ) +
+        ggplot2::facet_grid(YType ~ XType, switch = "both") +
+        ggplot2::scale_colour_viridis_c(
+            option = "plasma",
+            name   = "GitHub age<br/>(years)"
+        ) +
+        ggplot2::labs(
+            title = "Tools metrics correlations",
+        ) +
+        ggplot2::guides(
+            colour = ggplot2::guide_colourbar(
+                barheight = 15
+            )
+        ) +
+        theme_1000(base_size = 16) +
+        ggplot2::theme(
+            axis.title.x        = ggplot2::element_blank(),
+            axis.title.y        = ggplot2::element_blank(),
+            strip.text.x        = ggtext::element_markdown(
+                size   = 10,
+                face   = "bold",
+                hjust  = 0,
+                margin = ggplot2::margin()
+            ),
+            strip.text.y.left   = ggtext::element_markdown(
+                size   = 10,
+                face   = "bold",
+                hjust  = 0,
+                margin = ggplot2::margin()
+            ),
+            strip.placement     = "outside",
+            legend.title        = ggtext::element_markdown(),
+            plot.title.position = "plot"
+        )
+
+    grob <- ggplot2::ggplotGrob(plot)
+    grob$grobs[[4]] <- grid::nullGrob()
+
+    return(grob)
+}

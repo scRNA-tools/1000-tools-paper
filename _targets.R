@@ -504,6 +504,27 @@ list(
         ),
         format = "file"
     ),
+    tar_target(
+        correlations_plot,
+        plot_metric_correlations(references, tools)
+    ),
+    tar_target(
+        correlations_png,
+        ggplot2::ggsave(
+            plot     = correlations_plot,
+            filename = here(
+                "output", "supplementary", "metric_correlations.png"
+            ),
+            device   = ragg::agg_png,
+            width    = 20,
+            height   = 24,
+            units    = "cm",
+            res      = 300,
+            scaling  = 0.8,
+            bg       = "white"
+        ),
+        format = "file"
+    ),
     ##====================================================================##
     ## ---- Other plots ----
     ##====================================================================##
