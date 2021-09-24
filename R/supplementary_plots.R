@@ -158,6 +158,7 @@ plot_categories_platforms <- function(categories_idx, tools) {
                 Category == "Differential expression"  ~ "Diff. expression",
                 TRUE                                   ~ Category
             ),
+            Category = glue::glue("{Category} ({Total})"),
             Category = factor(Category, levels = unique(Category)),
             RPython = factor(
                 RPython,
