@@ -9,7 +9,7 @@ annotate_pub_date <- function() {
     list(
         ggplot2::geom_vline(
             xintercept = lubridate::ymd("2018-06-25"),
-            size   = 1,
+            size   = 0.5,
             colour = "#f781bf"
         ),
         ggplot2::annotate(
@@ -17,7 +17,7 @@ annotate_pub_date <- function() {
             x          = lubridate::ymd("2018-06-06"),
             y          = Inf,
             label      = "scRNA-tools publication",
-            size       = 5,
+            size       = 2.5,
             angle      = 90,
             hjust      = 1.1,
             vjust      = -0.5,

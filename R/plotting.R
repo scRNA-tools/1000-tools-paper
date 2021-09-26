@@ -50,7 +50,7 @@ plot_tools_over_time <- function(tools) {
         annotate_pub_date() +
         ggplot2::geom_line(
             ggplot2::aes(y = .data$Total),
-            size   = 2,
+            size   = 1,
             colour = "#984ea3",
             alpha  = 0.5
         ) +
@@ -60,7 +60,7 @@ plot_tools_over_time <- function(tools) {
                 predict(fit, newdata = data.frame(Day = day, Day2 = day * day))
             },
             linetype = "longdash",
-            size     = 1.5,
+            size     = 1,
             colour   = "#984ea3"
         ) +
         ggtext::geom_richtext(
@@ -70,7 +70,7 @@ plot_tools_over_time <- function(tools) {
             ),
             label        = fit_label,
             family       = "Noto Sans",
-            size         = 5,
+            size         = 2.5,
             colour       = "#984ea3",
             fill         = NA,
             label.colour = NA,
@@ -78,7 +78,7 @@ plot_tools_over_time <- function(tools) {
         ggplot2::labs(
             y = "Number of tools in database"
         ) +
-        theme_1000(base_size = 16)
+        theme_1000()
 }
 
 #' Plot platforms over time
@@ -188,7 +188,7 @@ plot_platforms_over_time <- function(tools) {
             data = fits,
             ggplot2::aes(label = Label),
             hjust        = 0,
-            size         = 3,
+            size         = 1.5,
             fill         = NA,
             label.colour = NA,
             lineheight   = 1,
@@ -209,7 +209,7 @@ plot_platforms_over_time <- function(tools) {
             x = "Date added to database",
             y = "Percentage of tools in database"
         ) +
-        theme_1000(base_size = 16, grid = "none") +
+        theme_1000(grid = "none") +
         ggplot2::theme(
             legend.position = "none"
         )
@@ -251,7 +251,7 @@ plot_publication_delay <- function(ref_links, references) {
         delays,
         ggplot2::aes(x = PreprintDate, y = Delay, colour = log10(Citations))
     ) +
-        ggplot2::geom_point(size = 2, alpha = 0.8) +
+        ggplot2::geom_point(size = 1, alpha = 0.8) +
         ggplot2::scale_y_continuous(breaks = seq(0, 1500, 250)) +
         ggplot2::scale_colour_viridis_c(
             option = "plasma",
@@ -263,10 +263,10 @@ plot_publication_delay <- function(ref_links, references) {
         ) +
         ggplot2::guides(
            colour = ggplot2::guide_colourbar(
-               barwidth = 15
+               barwidth = 8
            )
         ) +
-        theme_1000(base_size = 16) +
+        theme_1000() +
         ggplot2::theme(
             legend.position  = "bottom",
             legend.title     = ggtext::element_markdown(
@@ -275,7 +275,7 @@ plot_publication_delay <- function(ref_links, references) {
         )
 
     boxplot <- ggplot2::ggplot(delays, ggplot2::aes(y = Delay)) +
-        ggplot2::geom_boxplot(colour = "grey30") +
+        ggplot2::geom_boxplot(colour = "grey30", outlier.size = 0.8) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             panel.grid = ggplot2::element_blank(),
@@ -299,9 +299,9 @@ plot_publication_delay <- function(ref_links, references) {
         boxplot,
         density,
         rel_widths = c(4, 0.5, 1),
-        nrow = 1,
-        align = "h",
-        axis = c("tb")
+        nrow       = 1,
+        align      = "h",
+        axis       = c("tb")
     )
 }
 
@@ -344,13 +344,13 @@ plot_publication_status <- function(tools) {
         ggtext::geom_richtext(
             ggplot2::aes(label = Label),
             vjust        = -0.1,
-            size         = 5,
+            size         = 3,
             fill         = NA,
             label.colour = NA,
             lineheight   = 1.2,
             family       = "Noto Sans"
         ) +
-        bar_scales() +
+        bar_scales(expansion_mult = 0.2) +
         theme_1000_bar()
 }
 
@@ -387,14 +387,14 @@ plot_gh_stats <- function(gh_repos) {
     ggplot2::ggplot(stats, ggplot2::aes(x = "A", y = forcats::fct_rev(Stat))) +
         ggplot2::geom_text(
             ggplot2::aes(label = ValueLabel),
-            size    = 10,
+            size    = 4.5,
             colour  = "#984ea3",
             hjust   = 1,
             nudge_x = -0.01
         ) +
         ggplot2::geom_text(
             ggplot2::aes(label = Stat),
-            size    = 10,
+            size    = 4.5,
             colour  = "grey30",
             hjust   = 0,
             nudge_x = 0.01
@@ -492,14 +492,14 @@ plot_category_prop_trend <- function(categories, tools) {
         ggplot2::aes(x = Prop, y = Slope, label = Category, colour = Category)
     ) +
         ggplot2::geom_hline(yintercept = 0, colour = "red") +
-        ggplot2::geom_point() +
+        ggplot2::geom_point(size = 0.5) +
         ggrepel::geom_text_repel(
-            size              = 3,
+            size              = 1.2,
             family            = "Noto Sans",
-            segment.size      = 0.7,
+            segment.size      = 0.3,
             segment.alpha     = 0.5,
             segment.linetype  = "dotted",
-            box.padding       = 0.2,
+            box.padding       = 0.1,
             segment.curvature = -0.1,
             segment.ncp       = 3,
             segment.angle     = 20,
@@ -510,7 +510,7 @@ plot_category_prop_trend <- function(categories, tools) {
             x = "Proportion of tools in database",
             y = "Trend in proportion over time"
         ) +
-        theme_1000(base_size = 16) +
+        theme_1000() +
         ggplot2::theme(legend.position = "none")
 }
 
@@ -571,27 +571,33 @@ plot_models <- function(models_df, models_fits) {
             xintercept = 0,
             linetype   = "dashed",
             colour     = "#f781bf",
-            size       = 1
+            size       = 0.8
         ) +
         ggplot2::geom_errorbarh(
             ggplot2::aes(xmin = conf.low, xmax = conf.high),
             position = ggplot2::position_dodge(width = 0.5),
-            size     = 0.5,
+            size     = 0.3,
             height   = 0.2
         ) +
         ggplot2::geom_point(
             position = ggplot2::position_dodge2(width = 0.5),
-            stroke   = 1,
+            stroke   = 0.5,
             fill     = "white"
         ) +
         ggplot2::scale_colour_brewer(palette = "Set1") +
         ggplot2::scale_shape_manual(values = c(21, 16)) +
-        ggplot2::scale_size_manual(values = c(2.2, 3)) +
+        ggplot2::scale_size_manual(values = c(1.1, 1.5)) +
         ggplot2::labs(x = "Coefficient") +
-        theme_1000(base_size = 14) +
+        ggplot2::guides(
+            colour = ggplot2::guide_legend(order = 1),
+            shape  = ggplot2::guide_legend(order = 2),
+            size   = ggplot2::guide_legend(order = 2)
+        ) +
+        theme_1000() +
         ggplot2::theme(
             axis.title.y    = ggplot2::element_blank(),
             legend.position = "bottom",
+            legend.text     = ggplot2::element_text(size = 5),
             legend.box      = "vertical",
             legend.margin   = ggplot2::margin(t = -8)
         )
@@ -610,28 +616,28 @@ plot_models <- function(models_df, models_fits) {
         ggplot2::geom_col(
             ggplot2::aes(x = 1),
             colour = "grey30",
-            size   = 1,
+            size   = 0.5,
             alpha  = 0
         ) +
         ggtext::geom_richtext(
             ggplot2::aes(
-                label = Label, #format(AdjRSquared, digits = 3),
+                label = Label,
                 colour = Type
             ),
             hjust        = 0,
             fill         = NA,
             label.colour = NA,
-            size         = 3,
-            family       = "Noto Sans"
+            size         = 1.5,
+            family       = "Noto Sans Math"
         ) +
         ggplot2::scale_fill_brewer(palette = "Set1") +
         ggplot2::scale_colour_brewer(palette = "Set1") +
         ggplot2::labs(title = "Adjusted R<sup>2</sup>") +
-        ggplot2::theme_void(base_family = "Noto Sans", base_size = 16) +
+        ggplot2::theme_void(base_family = "Noto Sans") +
         ggplot2::theme(
             plot.title      = ggtext::element_markdown(
                 hjust = 0.5,
-                size = ggplot2::rel(0.6)
+                size  = ggplot2::rel(0.6)
             ),
             legend.position = "none",
             plot.background = ggplot2::element_rect(size = 1, colour = "grey60")
@@ -716,16 +722,16 @@ plot_platforms_bar <- function(tools) {
             data = plot_labels,
             ggplot2::aes(x = Total, label = Label),
             hjust        = 0,
-            nudge_x      = 5,
+            nudge_x      = 3,
             fill         = NA,
             label.colour = NA,
             lineheight   = 1.2,
-            size         = 5.5,
+            size         = 2,
             family       = "Noto Sans"
         ) +
         bar_scales(direction = "h", expansion_mult = 0.25) +
         ggplot2::labs(title = "Platforms", fill = "R/Python") +
-        theme_1000_bar(direction = "h", base_size = 16)
+        theme_1000_bar(direction = "h")
 }
 
 #' Plot licenses bar
@@ -794,16 +800,16 @@ plot_licenses_bar <- function(tools) {
             data = plot_labels,
             ggplot2::aes(x = Total, label = Label),
             hjust        = 0,
-            nudge_x      = 5,
+            nudge_x      = 3,
             fill         = NA,
             label.colour = NA,
             lineheight   = 1.2,
-            size         = 4,
+            size         = 1.8,
             family       = "Noto Sans"
         ) +
         bar_scales(direction = "h", expansion_mult = 0.22) +
         ggplot2::labs(title = "Licenses", fill = "R/Python") +
-        theme_1000_bar(direction = "h", base_size = 16)
+        theme_1000_bar(direction = "h")
 }
 
 #' Plot repositories bar
@@ -869,16 +875,16 @@ plot_repositories_bar <- function(tools) {
             data = plot_labels,
             ggplot2::aes(x = Total, label = Label),
             hjust        = 0,
-            nudge_x      = 5,
+            nudge_x      = 3,
             fill         = NA,
             label.colour = NA,
             lineheight   = 1.2,
-            size         = 5.5,
+            size         = 2,
             family       = "Noto Sans"
         ) +
         bar_scales(direction = "h", expansion_mult = 0.25) +
         ggplot2::labs(title = "Repositories", fill = "R/Python") +
-        theme_1000_bar(direction = "h", base_size = 16)
+        theme_1000_bar(direction = "h")
 }
 
 #' Plot categories bar
@@ -921,15 +927,16 @@ plot_categories_bar <- function(categories_idx, category_descs) {
         ggplot2::geom_col(fill = "#984ea3") +
         ggtext::geom_richtext(
             ggplot2::aes(
-                label   = Label,
-                hjust   = dplyr::if_else(Count == max(Count), 1, 0),
-                colour  = Count == max(Count)
+                label    = Label,
+                hjust    = dplyr::if_else(Count == max(Count), 1, 0),
+                colour   = Count == max(Count)
             ),
-            fill         = NA,
-            label.colour = NA,
-            lineheight   = 1.2,
-            size         = 4.5,
-            family       = "Noto Sans"
+            fill          = NA,
+            label.colour  = NA,
+            label.padding = grid::unit(c(0.1, 0.1, 0.1, 0.1), "lines"),
+            lineheight    = 1.2,
+            size          = 2,
+            family        = "Noto Sans"
         ) +
 
         ggplot2::scale_colour_manual(
@@ -943,7 +950,7 @@ plot_categories_bar <- function(categories_idx, category_descs) {
             space  = "free_y",
             switch = "y"
         ) +
-        theme_1000_bar(direction = "h", base_size = 16) +
+        theme_1000_bar(direction = "h") +
         ggplot2::theme(
             strip.placement = "outside",
             strip.text      = ggplot2::element_text(
@@ -1022,7 +1029,7 @@ plot_words_trend <- function(references, sc_stopwords, top_words) {
             ymin = -0.2, ymax = 0.2, ystep = 0.1,
             xmin = as.Date(-Inf), xmax = max(word_dates$Date)
         ) +
-        ggplot2::geom_line(colour = "grey60", alpha = 0.5, size = 0.5) +
+        ggplot2::geom_line(colour = "grey60", alpha = 0.5, size = 0.2) +
         ggplot2::annotate(
             "segment",
             x = as.Date(-Inf), xend = max(word_dates$Date),
@@ -1031,12 +1038,12 @@ plot_words_trend <- function(references, sc_stopwords, top_words) {
         ) +
         ggplot2::geom_vline(
             xintercept = max(word_dates$Date),
-            colour     = "grey60"
+            colour     = "grey60",
         ) +
         ggplot2::geom_line(
             data = top_data,
             ggplot2::aes(colour = Word),
-            size = 1
+            size = 0.5
         ) +
         ggrepel::geom_text_repel(
             data = dplyr::filter(top_data, Date == max(Date)),
@@ -1044,13 +1051,13 @@ plot_words_trend <- function(references, sc_stopwords, top_words) {
             direction          = "y",
             hjust              = 0,
             xlim = c(max(word_dates$Date) + 30, NA),
-            size               = 3.2,
+            size               = 1.5,
             family             = "Noto Sans",
             min.segment.length = 0,
-            segment.size       = 0.7,
+            segment.size       = 0.3,
             segment.alpha      = 0.5,
             segment.linetype   = "dotted",
-            box.padding        = 0.2,
+            box.padding        = 0.1,
             segment.curvature  = -0.1,
             segment.ncp        = 3,
             segment.angle      = 20,
@@ -1070,7 +1077,7 @@ plot_words_trend <- function(references, sc_stopwords, top_words) {
             x = "Publication date",
             y = "Change in proportion of abstracts"
         ) +
-        theme_1000(base_size = 16, grid = "none") +
+        theme_1000(grid = "none") +
         ggplot2::theme(
             legend.position = "none"
         )
@@ -1108,7 +1115,7 @@ plot_linked_prop <- function(references, ref_links) {
         ggplot2::geom_col(position = "stack") +
         ggtext::geom_richtext(
             ggplot2::aes(y = LabelPos, label = Label),
-            size         = 5,
+            size         = 2.5,
             colour       = "white",
             fill         = NA,
             label.colour = NA,
@@ -1119,7 +1126,7 @@ plot_linked_prop <- function(references, ref_links) {
             x = 1, y = 1,
             label = glue::glue("**Publications**<br/>{sum(plot_data$Count)}"),
             vjust        = 0,
-            size         = 5,
+            size         = 2.5,
             fill         = NA,
             label.colour = NA,
             lineheight   = 1.5,
@@ -1225,7 +1232,7 @@ plot_wordclouds <- function(references, sc_stopwords) {
             seed        = 1
         ) +
         ggplot2::scale_radius(
-            range  = c(2, 6),
+            range  = c(0.8, 2.6),
             limits = c(min(word_years$Prop), NA),
             guide  = "none"
         ) +
@@ -1236,10 +1243,15 @@ plot_wordclouds <- function(references, sc_stopwords) {
                 max(abs(word_years$Change))
             )
         ) +
+        ggplot2::guides(
+            colour = ggplot2::guide_colourbar(
+                barheight = 4
+            )
+        ) +
         ggplot2::facet_wrap(~ Year, nrow = 1) +
-        ggplot2::theme_minimal(base_family = "Noto Sans", base_size = 16) +
+        ggplot2::theme_minimal(base_family = "Noto Sans", base_size = 8) +
         ggplot2::theme(
-            strip.text   = ggplot2::element_text(size = 16, face = "bold"),
-            panel.margin = grid::unit(2, "lines")
+            strip.text   = ggplot2::element_text(size = 10, face = "bold"),
+            panel.margin = grid::unit(0.5, "lines")
         )
 }

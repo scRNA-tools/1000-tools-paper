@@ -574,7 +574,19 @@ list(
             height   = 14,
             units    = "cm",
             res      = 300,
-            scaling  = 0.5,
+            bg       = "white"
+        ),
+        format = "file"
+    ),
+    tar_target(
+        overview_figure_pdf,
+        ggplot2::ggsave(
+            plot     = overview_figure,
+            filename = here::here("output", "figures", "overview.pdf"),
+            device   = grDevices::cairo_pdf,
+            width    = 20,
+            height   = 14,
+            units    = "cm",
             bg       = "white"
         ),
         format = "file"
@@ -598,7 +610,19 @@ list(
             height   = 16,
             units    = "cm",
             res      = 300,
-            scaling  = 0.5,
+            bg       = "white"
+        ),
+        format = "file"
+    ),
+    tar_target(
+        trends_figure_pdf,
+        ggplot2::ggsave(
+            plot     = trends_figure,
+            filename = here::here("output", "figures", "trends.pdf"),
+            device   = grDevices::cairo_pdf,
+            width    = 20,
+            height   = 16,
+            units    = "cm",
             bg       = "white"
         ),
         format = "file"
@@ -623,7 +647,19 @@ list(
             height   = 18,
             units    = "cm",
             res      = 300,
-            scaling  = 0.5,
+            bg       = "white"
+        ),
+        format = "file"
+    ),
+    tar_target(
+        open_figure_pdf,
+        ggplot2::ggsave(
+            plot     = open_figure,
+            filename = here::here("output", "figures", "open.pdf"),
+            device   = grDevices::cairo_pdf,
+            width    = 20,
+            height   = 18,
+            units    = "cm",
             bg       = "white"
         ),
         format = "file"

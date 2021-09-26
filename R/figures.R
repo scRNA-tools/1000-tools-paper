@@ -30,7 +30,8 @@ make_overview_figure <- function(platforms_bar_plot, repositories_bar_plot,
         tools_plot,
         pub_status_plot,
         nrow   = 1,
-        labels = c("A", "B")
+        labels = c("A", "B"),
+        label_size = 10
     )
 
     left <- cowplot::plot_grid(
@@ -39,6 +40,7 @@ make_overview_figure <- function(platforms_bar_plot, repositories_bar_plot,
         nrow = 2,
         rel_heights = c(1, 1.1),
         labels = c("", "C"),
+        label_size = 10,
         vjust  = 1
     )
 
@@ -48,6 +50,7 @@ make_overview_figure <- function(platforms_bar_plot, repositories_bar_plot,
         nrow       = 1,
         rel_widths = c(1, 0.4),
         labels     = c("", "D"),
+        label_size = 10,
         hjust      = 1
     )
 }
@@ -73,13 +76,15 @@ make_trends_figure <- function(platforms_time_plot, category_trend_plot,
             category_trend_plot,
             nrow       = 1,
             rel_widths = c(1, 1),
-            labels     = c("A", "B")
+            labels     = c("A", "B"),
+            label_size = 10
         ),
         word_trends_plot,
         wordclouds_plot,
         nrow        = 3,
         rel_heights = c(1, 1, 0.5),
-        labels      = c("", "C", "D")
+        labels      = c("", "C", "D"),
+        label_size  = 10
     )
 }
 
@@ -99,6 +104,7 @@ make_open_figure <- function(linked_prop_bar, delay_plot, gh_stats_plot,
                              publications_models_plot, tools_models_plot) {
 
     extrafont::loadfonts(quiet = TRUE)
+    cowplot::set_null_device("agg")
 
     cowplot::plot_grid(
         cowplot::plot_grid(
@@ -107,13 +113,15 @@ make_open_figure <- function(linked_prop_bar, delay_plot, gh_stats_plot,
             delay_plot,
             nrow       = 1,
             rel_widths = c(0.45, 0.2, 1),
-            labels     = c("A", "B", "C")
+            labels     = c("A", "B", "C"),
+            label_size = 10
         ),
         cowplot::plot_grid(
             publications_models_plot,
             tools_models_plot,
             nrow   = 1,
-            labels = c("D", "E")
+            labels = c("D", "E"),
+            label_size = 10
         ),
         nrow = 2,
         rel_heights = c(1, 1.2)

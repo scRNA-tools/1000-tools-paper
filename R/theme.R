@@ -17,7 +17,7 @@
 #' Inspired by `hbrthemes::theme_ipsum()`
 #'
 #' @return theme object
-theme_1000 <- function(base_size = 11, base_family = "Noto Sans",
+theme_1000 <- function(base_size = 8, base_family = "Noto Sans",
                        base_line_size = base_size / 22,
                        base_rect_size = base_size / 22,
                        plot_title_size = base_size * 1.6,
