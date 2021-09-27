@@ -590,8 +590,8 @@ plot_models <- function(models_df, models_fits) {
         ggplot2::labs(x = "Coefficient") +
         ggplot2::guides(
             colour = ggplot2::guide_legend(order = 1),
-            shape  = ggplot2::guide_legend(order = 2),
-            size   = ggplot2::guide_legend(order = 2)
+            shape  = ggplot2::guide_legend(order = 2, title = "p-value < 0.05"),
+            size   = ggplot2::guide_legend(order = 2, title = "p-value < 0.05")
         ) +
         theme_1000() +
         ggplot2::theme(

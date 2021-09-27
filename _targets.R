@@ -292,7 +292,7 @@ list(
             publications_models,
             types = c(
                 citations = "Citations",
-                altmetric = "Altmetric"
+                altmetric = "AAS"
             ),
             term_labels = c(
                 "(Intercept)"                 = "(Intercept)",
@@ -312,7 +312,7 @@ list(
             publications_models,
             types = c(
                 citations = "Citations",
-                altmetric = "Altmetric"
+                altmetric = "AAS"
             )
         )
     ),
@@ -326,7 +326,7 @@ list(
             tools_models,
             types = c(
                 citations = "Total citations",
-                altmetric = "Total altmetric",
+                altmetric = "Total AAS",
                 gh_stars  = "GitHub stars"
             ),
             term_labels = c(
@@ -352,7 +352,7 @@ list(
             tools_models,
             types = c(
                 citations = "Total citations",
-                altmetric = "Total altmetric",
+                altmetric = "Total AAS",
                 gh_stars  = "GitHub stars"
             )
         )
