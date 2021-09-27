@@ -45,7 +45,10 @@ update_references <- function(references) {
                 stringr::str_squish()
         ) %>%
         dplyr::mutate(
-            NumAuthors      = purrr::map_dbl(author, ~ nrow(.x)),
+            NumAuthors      = purrr::map_dbl(
+                author,
+                ~ dplyr::if_else(is.null(.x), NA_integer_, nrow(.x))
+            ),
             NumReferences   = as.numeric(reference.count),
             Days            = as.numeric(lubridate::today() - Date),
             Years           = Days / 365.25,
