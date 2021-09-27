@@ -596,6 +596,7 @@ plot_models <- function(models_df, models_fits) {
         theme_1000() +
         ggplot2::theme(
             axis.title.y    = ggplot2::element_blank(),
+            axis.text.y     = ggtext::element_markdown(),
             legend.position = "bottom",
             legend.text     = ggplot2::element_text(size = 5),
             legend.box      = "vertical",
@@ -624,11 +625,12 @@ plot_models <- function(models_df, models_fits) {
                 label = Label,
                 colour = Type
             ),
-            hjust        = 0,
-            fill         = NA,
-            label.colour = NA,
-            size         = 1.5,
-            family       = "Noto Sans Math"
+            hjust         = 0,
+            fill          = NA,
+            label.colour  = NA,
+            label.padding = grid::unit(c(0.1, 0.1, 0.1, 0.1), "lines"),
+            size          = 1.5,
+            family        = "Noto Sans"
         ) +
         ggplot2::scale_fill_brewer(palette = "Set1") +
         ggplot2::scale_colour_brewer(palette = "Set1") +

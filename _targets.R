@@ -296,8 +296,9 @@ list(
             ),
             term_labels = c(
                 "(Intercept)"                 = "(Intercept)",
-                "log2(NumReferences + 1)"     = "log2(Num references + 1)",
-                "log2(NumAuthors)"            = "log2(Num authors)",
+                "log2(NumReferences + 1)"     =
+                    "log<sub>2</sub>(Num references + 1)",
+                "log2(NumAuthors)"            = "log<sub>2</sub>(Num authors)",
                 "HasPreprintTRUE"             = "Has preprint",
                 "splines::ns(Years, df = 3)3" = "Years (3rd degree)",
                 "splines::ns(Years, df = 3)2" = "Years (2nd degree)",
@@ -330,9 +331,10 @@ list(
             ),
             term_labels = c(
                 "(Intercept)"                      = "(Intercept)",
-                "GHContributors"                   = "GitHub contributors",
                 "HasRepoTRUE"                      = "Has repository",
                 "HasLicenseTRUE"                   = "Has license",
+                "log2(GHContributors + 1)"         =
+                    "log<sub>2</sub>(Contributors + 1)",
                 "PlatformR"                        = "Platform (R)",
                 "PlatformPython"                   = "Platform (Python)",
                 "PlatformBoth"                     = "Platform (Both)",

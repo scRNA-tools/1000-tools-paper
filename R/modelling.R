@@ -108,7 +108,7 @@ model_tools <- function(tools) {
             HasLicense +
             Publications +
             Preprints +
-            GHContributors,
+            log2(GHContributors + 1),
         data = model_data
     )
 
@@ -120,7 +120,7 @@ model_tools <- function(tools) {
             HasLicense +
             Publications +
             Preprints +
-            GHContributors,
+            log2(GHContributors + 1),
         data = model_data
     )
 
@@ -132,7 +132,7 @@ model_tools <- function(tools) {
             HasLicense +
             Publications +
             Preprints +
-            GHContributors,
+            log2(GHContributors + 1),
         data = model_data
     )
 
