@@ -336,6 +336,8 @@ CellRanger	UMIs
 CellRanger	Visualisation
 CellRank	Ordering
 CellRank	Visualisation
+CellRegMap	Simulation
+CellRegMap	Variants
 CellRouter	Clustering
 CellRouter	DimensionalityReduction
 CellRouter	ExpressionPatterns
@@ -373,6 +375,9 @@ Cepo	Visualisation
 Cerebro	GeneSets
 Cerebro	Interactive
 Cerebro	Visualisation
+CeTF	GeneNetworks
+CeTF	GeneSets
+CeTF	Visualisation
 cFIT	DimensionalityReduction
 cFIT	Integration
 cFIT	Visualisation
@@ -443,6 +448,10 @@ COAC	GeneNetworks
 CoGAPs	DimensionalityReduction
 CoGAPs	GeneSets
 CoGAPs	Visualisation
+cola	Clustering
+cola	DimensionalityReduction
+cola	GeneSets
+cola	Visualisation
 COMET	MarkerGenes
 COMET	Visualisation
 Compartmap	Integration
@@ -457,6 +466,9 @@ CONCLUS	Normalisation
 CONCLUS	RareCells
 CONCLUS	Visualisation
 condiments	Ordering
+CoNGA	Clustering
+CoNGA	Immune
+CoNGA	Visualisation
 CONGAS	Variants
 CONICS	Integration
 CONICS	Variants
@@ -491,6 +503,8 @@ coupleCoC	Clustering
 coupleCoC	Integration
 coupleCoC_plus	Clustering
 coupleCoC_plus	Integration
+coupledAE-patchseq	DimensionalityReduction
+coupledAE-patchseq	Integration
 CPA	DimensionalityReduction
 CPA	Perturbations
 CPLVM	DimensionalityReduction
@@ -535,6 +549,7 @@ ddSeeker	UMIs
 DECENT	DifferentialExpression
 DECENT	Imputation
 DECODE	Imputation
+deCS	Classification
 DEEF	DimensionalityReduction
 DeepCycle	CellCycle
 DeepCycle	DimensionalityReduction
@@ -703,6 +718,7 @@ DUSC	Clustering
 Dynamo	Ordering
 Dynamo	Simulation
 Dynamo	Visualisation
+dynDeepDRIM	GeneNetworks
 dyngen	Simulation
 dyngen	Visualisation
 dynverse	Normalisation
@@ -716,6 +732,8 @@ EDGE	DimensionalityReduction
 EDGE	VariableGenes
 EEISP	GeneNetworks
 elasticC3	Integration
+ELeFHAnt	Classification
+ELeFHAnt	Integration
 ELSA	Classification
 ELSA	DimensionalityReduction
 embeddr	Ordering
@@ -728,6 +746,7 @@ ENHANCE	DimensionalityReduction
 ENHANCE	Imputation
 EnImpute	Imputation
 EnsembleKQC	QualityControl
+EnTSSR	Imputation
 EPIC	Variants
 EPIC	Visualisation
 eQTLsingle	Alignment
@@ -798,6 +817,9 @@ FORKS	Visualisation
 FRmatch	Classification
 FRmatch	Interactive
 FRmatch	Visualisation
+FUNKI	GeneNetworks
+FUNKI	Interactive
+FUNKI	Visualisation
 G2S3	Imputation
 GapClust	Clustering
 GapClust	RareCells
@@ -868,6 +890,8 @@ Granatum	QualityControl
 Granatum	Visualisation
 GrandPrix	DimensionalityReduction
 GrandPrix	Ordering
+graph-sc	DimensionalityReduction
+graph-sc	Visualisation
 GraphCS	Classification
 GraphEmbed	DimensionalityReduction
 GraphEmbed	Visualisation
@@ -1177,6 +1201,12 @@ mitch	Visualisation
 MLG	Clustering
 MLG	Integration
 MLG	Visualisation
+mmutil	Clustering
+mmutil	DimensionalityReduction
+mmutil	GeneFiltering
+mmutil	Integration
+mmutil	QualityControl
+mmutil	Simulation
 mnnpy	Integration
 Moana	Classification
 Moana	Clustering
@@ -1200,6 +1230,8 @@ Monocle	ExpressionPatterns
 Monocle	MarkerGenes
 Monocle	Ordering
 Monocle	Visualisation
+MOSCATO	GeneNetworks
+MOSCATO	Simulation
 Mpath	Ordering
 mpCMF	DimensionalityReduction
 MPSSC	Clustering
@@ -1224,6 +1256,8 @@ MUDAN	Normalisation
 MUDAN	QualityControl
 MUDAN	VariableGenes
 MUDAN	Visualisation
+MultiK	Clustering
+MultiK	Visualisation
 MultiMAP	Integration
 MUREN	Normalisation
 muscat	DifferentialExpression
@@ -1316,6 +1350,7 @@ Palantir	QualityControl
 Palantir	Visualisation
 Pamona	Integration
 Pamona	Visualisation
+Pando	GeneNetworks
 ParaDPMM	Classification
 PARC	Clustering
 PBA	Ordering
@@ -1474,6 +1509,8 @@ RCAv2	DifferentialExpression
 RCAv2	DimensionalityReduction
 RCAv2	Normalisation
 RCAv2	Visualisation
+RcppML	Clustering
+RcppML	DimensionalityReduction
 RCSL	Clustering
 RCSL	GeneFiltering
 RCSL	Ordering
@@ -1517,6 +1554,8 @@ Rsubread	Alignment
 Rsubread	Quantification
 rSuperCT	Classification
 rSuperCT	Visualisation
+rusty_axe	DimensionalityReduction
+rusty_axe	Visualisation
 RVAgene	DimensionalityReduction
 RVAgene	Simulation
 SAFE	Clustering
@@ -1570,6 +1609,9 @@ SC3	Interactive
 SC3s	Clustering
 SCA	DimensionalityReduction
 SCA	RareCells
+scAAnet	Clustering
+scAAnet	MarkerGenes
+scAAnet	Visualisation
 scACE	Clustering
 scACE	Integration
 scACE	Simulation
@@ -1627,6 +1669,7 @@ scAPAtrap	AlternativeSplicing
 scAPAtrap	Quantification
 SCAPTURE	AlternativeSplicing
 SCAPTURE	Quantification
+scArches	Integration
 scarf	CellCycle
 scarf	Clustering
 scarf	DifferentialExpression
@@ -1655,7 +1698,10 @@ scbean	Integration
 scbean	QualityControl
 scbean	Visualisation
 scBio	Integration
+scBT	DifferentialExpression
 SCC	Imputation
+scCAEs	Clustering
+scCAEs	DimensionalityReduction
 SCCAF	Clustering
 SCCAF	Visualisation
 scCAN	Clustering
@@ -1718,6 +1764,7 @@ scDECAF	Classification
 scDECAF	GeneSets
 scDeepCluster	Clustering
 scDeepCluster	DimensionalityReduction
+scDeepSort	Classification
 scDesign	Simulation
 scDesign2	Simulation
 scDetect	Classification
@@ -1733,6 +1780,8 @@ scdiff	GeneNetworks
 scdiff	Interactive
 scdiff	Ordering
 scdiff	Visualisation
+scDiffCom	GeneNetworks
+scDiffCom	Visualisation
 scdNet	GeneNetworks
 scdNet	GeneSets
 scdney	Classification
@@ -1786,6 +1835,14 @@ scFeatureFilter	Visualisation
 scfind	Classification
 scfind	Interactive
 scfind	MarkerGenes
+scFlow	Classification
+scFlow	Clustering
+scFlow	DimensionalityReduction
+scFlow	GeneSets
+scFlow	Integration
+scFlow	MarkerGenes
+scFlow	QualityControl
+scFlow	Visualisation
 scFusion	Variants
 scGAE	DimensionalityReduction
 scGAE	Visualisation
@@ -1843,6 +1900,7 @@ scHOT	ExpressionPatterns
 scHOT	Visualisation
 scHPF	DimensionalityReduction
 scHPF	ExpressionPatterns
+scHPL	Classification
 scIB	Integration
 SciBet	Classification
 SciBet	VariableGenes
@@ -1886,9 +1944,15 @@ scIVA	Interactive
 scIVA	MarkerGenes
 scIVA	QualityControl
 scIVA	Visualisation
+Sciviewer	Interactive
+Sciviewer	Visualisation
 scLAPA	AlternativeSplicing
 scLAPA	Clustering
 scLCA	Clustering
+scLINE	DimensionalityReduction
+scLINE	GeneNetworks
+scLINE	Integration
+scLINE	Visualisation
 SClineager	Ordering
 SClineager	Variants
 scLink	GeneNetworks
@@ -2009,6 +2073,8 @@ scprep	Normalisation
 scprep	QualityControl
 scprep	Visualisation
 scPretrain	Classification
+scProject	Classification
+scProject	Visualisation
 SCQC	GeneFiltering
 SCQC	QualityControl
 scQcut	Clustering
@@ -2090,6 +2156,7 @@ scShaper	Ordering
 scsim	Simulation
 scSimClassify	Classification
 scSimClassify	Quantification
+SCSit	UMIs
 scsnv	Alignment
 scsnv	Quantification
 scsnv	Variants
@@ -2371,6 +2438,7 @@ SPaRTAN	GeneNetworks
 Specter	Clustering
 Spectrum	Clustering
 Spectrum	Visualisation
+splattdr	Simulation
 Splatter	Simulation
 Splatter	Visualisation
 SPRING	DimensionalityReduction
@@ -2423,6 +2491,7 @@ TAR-scRNA-seq	Quantification
 TASC	DifferentialExpression
 TASC	Normalisation
 TASC	Quantification
+tascCODA	Modality
 TASIC	Interactive
 TASIC	Ordering
 TBSP	Clustering
@@ -2497,6 +2566,7 @@ TWO-SIGMA	GeneSets
 TWO-SIGMA	Simulation
 txburst	AlleleSpecific
 UCell	GeneSets
+UICPC	Clustering
 UMI_analysis	Quantification
 UMI_analysis	UMIs
 UMI-tools	Quantification

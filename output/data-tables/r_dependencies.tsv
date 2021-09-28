@@ -185,6 +185,8 @@ scDblFinder	scuttle	Imports
 scDblFinder	mbkmeans	Imports
 scDD	SingleCellExperiment	Imports
 scDD	scran	Imports
+scDiffCom	Seurat	Imports
+scDiffCom	SingleCellSignalR	Suggests
 scds	SingleCellExperiment	Imports
 scds	scater	Suggests
 scFeatureFilter	SingleCellExperiment	Suggests

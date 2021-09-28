@@ -10,13 +10,15 @@ capital	scprep	Requires
 cardec	scanpy	Requires
 Cell-BLAST	anndata	Requires
 cell2cell	scanpy	Requires
+cell2location	scvi-tools	Requires
+cell2location	scanpy	Requires
 cellpath	anndata	Requires
 cellpath	scvelo	Requires
 cellrank	scanpy	Requires
 cellrank	scvelo	Requires
-cellrank	wot	Extra
 cellxgene	anndata	Requires
 cirrocumulus	anndata	Requires
+cirrocumulus	scanpy	Extra
 CITE-seq-Count	umi-tools	Requires
 cna	anndata	Requires
 cna	scanpy	Requires
@@ -40,6 +42,7 @@ doubletdetection	scanpy	Requires
 dropkick	scanpy	Requires
 fba	umi-tools	Requires
 FlowGrid	anndata	Requires
+graph-sc	scanpy	Requires
 imap	scanpy	Requires
 infercnvpy	anndata	Requires
 infercnvpy	scanpy	Requires
@@ -77,6 +80,9 @@ scanpy	bbknn	Extra
 scanpy	magic-impute	Extra
 scanpy	scanorama	Extra
 scanpy	scrublet	Extra
+scArches	scanpy	Requires
+scArches	anndata	Requires
+scArches	scvi-tools	Requires
 scbean	scanpy	Requires
 scbean	anndata	Requires
 SCCAF	scanpy	Requires

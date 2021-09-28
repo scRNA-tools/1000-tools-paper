@@ -80,7 +80,7 @@ CaSpER	NA	NA	NA	akdess/CaSpER
 CaSTLe	NA	NA	NA	yuvallb/CaSTLe
 CausalDAG	NA	NA	causaldag	uhlerlab/causaldag
 cb_sniffer	NA	NA	NA	sridnona/cb_sniffer
-ccdf	NA	NA	NA	Mgauth/ccdf
+ccdf	NA	ccdf	NA	Mgauth/ccdf
 ccfindR	ccfindR	NA	NA	hjunwoo/ccfindR
 CCNMF	NA	NA	NA	XQBai/CCNMF
 CCPE	NA	NA	NA	LiuJJ0327/CCPE
@@ -90,7 +90,7 @@ celaref	celaref	NA	NA	MonashBioinformaticsPlatform/celaref
 celda	celda	NA	NA	campbio/celda
 Cell-BLAST	NA	NA	Cell-BLAST	gao-lab/Cell_BLAST
 cell2cell	NA	NA	cell2cell	earmingol/cell2cell
-cell2location	NA	NA	NA	BayraktarLab/cell2location
+cell2location	NA	NA	cell2location	BayraktarLab/cell2location
 cellAlign	NA	NA	NA	shenorrLab/cellAlign
 Cellar	NA	NA	NA	ferrocactus/cellar
 CellaRepertorium	CellaRepertorium	NA	NA	amcdavid/CellaRepertorium
@@ -114,6 +114,7 @@ CellPath	NA	NA	cellpath	PeterZZQ/CellPath
 CellPhoneDB	NA	NA	CellPhoneDB	Teichlab/cellphonedb
 CellRanger	NA	NA	NA	10XGenomics/cellranger
 CellRank	NA	NA	cellrank	theislab/cellrank
+CellRegMap	NA	NA	NA	limix/CellRegMap
 CellRouter	NA	NA	NA	edroaldo/cellrouter
 CellSIUS	NA	NA	NA	Novartis/CellSIUS
 cellSNP	NA	NA	cellSNP	single-cell-genetics/cellSNP
@@ -127,6 +128,7 @@ cellxgene	NA	NA	cellxgene	chanzuckerberg/cellxgene
 cellxgene_VIP	NA	NA	NA	interactivereport/cellxgene_VIP
 Cepo	NA	NA	NA	PYangLab/Cepo
 Cerebro	NA	NA	NA	romanhaa/Cerebro
+CeTF	CeTF	NA	NA	cbiagii/CeTF
 cFIT	NA	NA	NA	pengminshi/cFIT
 CHETAH	CHETAH	NA	NA	jdekanter/CHETAH
 chooseR	NA	NA	NA	rbpatt2019/chooseR
@@ -153,11 +155,13 @@ cNMF	NA	NA	NA	dylkot/cNMF
 CNNC	NA	NA	NA	xiaoyeye/CNNC
 COAC	NA	NA	NA	ChengF-Lab/COAC
 CoGAPs	CoGAPS	NA	NA	FertigLab/CoGAPS
+cola	cola	NA	NA	jokergoo/cola
 COMET	NA	NA	COMETSC	MSingerLab/COMETSC
 Compartmap	compartmap	NA	NA	biobenkj/compartmap
 compass	NA	NA	NA	nceglia/compass
 CONCLUS	conclus	NA	NA	lancrinlab/CONCLUS
 condiments	condiments	NA	NA	HectorRDB/condiments
+CoNGA	NA	NA	NA	phbradley/conga
 CONGAS	NA	NA	congas	caravagnalab/congas
 CONICS	NA	NA	NA	diazlab/CONICS
 Connectome	NA	NA	NA	msraredon/Connectome
@@ -172,6 +176,7 @@ COT	NA	NA	NA	MintaYLu/COT
 countClust	CountClust	NA	NA	kkdey/CountClust
 coupleCoC	NA	NA	NA	cuhklinlab/coupleCoC
 coupleCoC_plus	NA	NA	NA	cuhklinlab/coupleCoC_plus
+coupledAE-patchseq	NA	NA	NA	alleninstitute/coupledAE-patchseq
 CPA	NA	NA	NA	facebookresearch/CPA
 CPLVM	NA	NA	cplvm	andrewcharlesjones/cplvm
 CrossTalkeR	NA	NA	NA	CostaLab/CrossTalkeR
@@ -197,6 +202,7 @@ DDA	NA	NA	NA	gbouland/DDA
 ddSeeker	NA	NA	NA	cgplab/ddSeeker
 DECENT	NA	NA	NA	cz-ye/DECENT
 DECODE	NA	NA	NA	shmohammadi86/DECODE
+deCS	NA	NA	NA	GuangshengPei/deCS
 DEEF	NA	NA	NA	DaigoOkada/deef
 DeepCycle	NA	NA	NA	andreariba/DeepCycle
 DeepDRIM	NA	NA	NA	jiaxchen2-c/DeepDRIM
@@ -266,12 +272,14 @@ DUBStepR	NA	DUBStepR	NA	prabhakarlab/DUBStepR
 Dune	Dune	NA	NA	HectorRDB/Dune
 DUSC	NA	NA	NA	KorkinLab/DUSC
 Dynamo	NA	NA	NA	aristoteleo/dynamo-release
+dynDeepDRIM	NA	NA	NA	yuxu-1/dynDeepDRIM
 dyngen	NA	dyngen	NA	dynverse/dyngen
 dynverse	NA	NA	NA	dynverse/dynverse
 ECLAIR	NA	NA	ECLAIR	GGiecold/ECLAIR
 EDGE	NA	NA	NA	shawnstat/EDGE
 EEISP	NA	NA	NA	Natsu01/EEISP
 elasticC3	NA	NA	NA	cuhklinlab/elasticC3
+ELeFHAnt	NA	NA	NA	praneet1988/ELeFHAnt
 ELSA	NA	NA	NA	diazlab/ELSA
 embeddr	NA	NA	NA	kieranrcampbell/embeddr
 EMEP	NA	NA	NA	lixt314/EMEP
@@ -280,6 +288,7 @@ ENCORE	NA	NA	NA	SONG0417/ENCORE_V1.0
 ENHANCE	NA	NA	NA	yanailab/enhance
 EnImpute	NA	NA	NA	Zhangxf-ccnu/EnImpute
 EnsembleKQC	NA	NA	NA	mzhq/EnsembleKQC
+EnTSSR	NA	NA	NA	Oyl-CityU/EnTSSR
 EPIC	NA	NA	NA	rujinwang/EPIC
 eQTLsingle	NA	NA	NA	horsedayday/eQTLsingle
 ESAT	NA	NA	NA	garber-lab/ESAT
@@ -296,7 +305,7 @@ fcoex	fcoex	NA	NA	csbl-usp/fcoex
 FEAST	FEAST	NA	NA	suke18/FEAST
 FEATS	NA	NA	feats	edwinv87/feats
 FIESTA	NA	NA	NA	elnazmirzaei/FIESTA
-FiRE	NA	NA	NA	princethewinner/FiRE
+FiRE	NA	FiRE	NA	princethewinner/FiRE
 FIRM	NA	NA	NA	mingjingsi/FIRM
 fishpond	fishpond	NA	NA	mikelove/fishpond
 FLAMES	NA	NA	NA	LuyiTian/FLAMES
@@ -305,6 +314,7 @@ FlowGrid	NA	NA	FlowGrid	holab-hku/FlowGrid
 FLOWMAPR	NA	NA	NA	zunderlab/FLOWMAP
 FORKS	NA	NA	NA	macsharma/FORKS
 FRmatch	NA	NA	NA	JCVenterInstitute/FRmatch
+FUNKI	NA	NA	NA	saezlab/ShinyFUNKI
 G2S3	NA	NA	NA	ZWang-Lab/G2S3
 GapClust	NA	NA	NA	fabotao/GapClust
 Garnett	NA	NA	NA	cole-trapnell-lab/garnett
@@ -328,6 +338,7 @@ GPseudoClust	NA	NA	NA	magStra/GPseudoClust
 GPseudoRank	NA	NA	NA	magStra/GPseudoRank
 Granatum	NA	NA	NA	NA
 GrandPrix	NA	NA	NA	ManchesterBioinference/GrandPrix
+graph-sc	NA	NA	graph-sc	ciortanmadalina/graph-sc-package
 GraphCS	NA	NA	NA	biomed-AI/GraphCS
 GraphEmbed	NA	NA	graphembed	fabriziocosta/GraphEmbed
 GraphSCC	NA	NA	NA	biomed-AI/GraphSCC
@@ -457,12 +468,14 @@ miQC	miQC	NA	NA	greenelab/miQC
 miRSCAPE	NA	NA	NA	hannenhalli-lab/miRSCAPE
 mitch	mitch	NA	NA	markziemann/mitch
 MLG	NA	NA	NA	keleslab/mlg
+mmutil	NA	NA	NA	ypark/mmutil
 mnnpy	NA	NA	mnnpy	chriscainx/mnnpy
 Moana	NA	NA	moana	yanailab/moana
 MOFA	NA	NA	mofapy	bioFAM/MOFA
 MOFA2	MOFA2	NA	mofapy2	bioFAM/MOFA2
 Monet	NA	NA	monet	flo-compbio/monet
 Monocle	monocle	NA	NA	cole-trapnell-lab/monocle-release
+MOSCATO	NA	NA	NA	lorinmil/MOSCATO
 Mpath	NA	NA	NA	JinmiaoChenLab/Mpath
 mpCMF	NA	NA	NA	pedrofale/mpCMF
 MPSSC	NA	NA	NA	ishspsy/project
@@ -472,6 +485,7 @@ mrtree	NA	NA	NA	pengminshi/MRtree
 MTGO-SC	NA	NA	NA	ne1s0n/MTGOsc
 mtSC	NA	NA	mtSC	bm2-lab/mtSC
 MUDAN	NA	NA	NA	JEFworks/MUDAN
+MultiK	NA	NA	NA	siyao-liu/MultiK
 MultiMAP	NA	NA	NA	Teichlab/MultiMAP
 MUREN	NA	NA	NA	hippo-yf/MUREN
 muscat	muscat	NA	NA	HelenaLC/muscat
@@ -510,6 +524,7 @@ Outrigger	NA	NA	outrigger	YeoLab/outrigger
 pagoda2	NA	pagoda2	NA	hms-dbmi/pagoda2
 Palantir	NA	NA	palantir	dpeerlab/Palantir
 Pamona	NA	NA	pamona	caokai1073/Pamona
+Pando	NA	NA	NA	quadbiolab/Pando
 ParaDPMM	NA	NA	NA	tiehangd/Para_DPMM
 PARC	NA	NA	parc	ShobiStassen/PARC
 PBA	NA	NA	NA	AllonKleinLab/PBA
@@ -567,6 +582,7 @@ RayleighSelection	NA	NA	NA	CamaraLab/RayleighSelection
 RCA	NA	NA	NA	GIS-SP-Group/RCA
 rCASC	NA	NA	NA	kendomaniac/rCASC
 RCAv2	NA	NA	NA	prabhakarlab/RCAv2
+RcppML	NA	RcppML	NA	zdebruine/RcppML
 RCSL	RCSL	RCSL	NA	QinglinMei/RCSL
 REBET	NA	NA	NA	genemine/REBET
 reCAT	NA	NA	NA	tinglab/reCAT
@@ -586,6 +602,7 @@ rpca	NA	rpca	NA	macieksk/rpca
 RSCORE	NA	NA	NA	wycwycpku/RSCORE
 Rsubread	Rsubread	NA	NA	NA
 rSuperCT	NA	NA	NA	weilin-genomics/rSuperCT
+rusty_axe	NA	NA	rusty-axe-bbrener1	bbrener1/rusty_axe
 RVAgene	NA	NA	NA	maclean-lab/RVAgene
 SAFE	NA	NA	NA	yycunc/SAFEclustering
 SAIC	NA	NA	NA	xiweiwu/SAIC
@@ -607,6 +624,7 @@ SC2P	NA	NA	NA	haowulab/SC2P
 SC3	SC3	NA	NA	hemberg-lab/sc3
 SC3s	NA	NA	sc3s	hemberg-lab/sc3s
 SCA	NA	NA	NA	bendemeo/shannonca
+scAAnet	NA	NA	NA	AprilYuge/scAAnet_latest
 scACE	NA	NA	NA	cuhklinlab/scACE
 scAdapt	NA	NA	NA	zhoux85/scAdapt
 scAEspy	NA	NA	scaespy	NA
@@ -627,6 +645,7 @@ Scanpy	NA	NA	scanpy	theislab/scanpy
 scAPA	NA	NA	NA	ElkonLab/scAPA
 scAPAtrap	NA	NA	NA	BMILAB/scAPAtrap
 SCAPTURE	NA	NA	NA	YangLab/SCAPTURE
+scArches	NA	NA	scArches	theislab/scarches
 scarf	NA	NA	scarf	parashardhapola/scarf
 scASK	NA	NA	NA	liubo2358/scASKcmd
 Scater	scater	NA	NA	davismcc/scater
@@ -636,7 +655,9 @@ scBASE	NA	NA	scbase	churchill-lab/scBASE
 scBatch	NA	NA	NA	tengfei-emory/scBatch
 scbean	NA	NA	scbean	jhu99/scbean
 scBio	NA	scBio	NA	NA
+scBT	NA	NA	NA	satabdisaha1288/scBT
 SCC	NA	NA	NA	nwpuzhengyan/SCC
+scCAEs	NA	NA	NA	gushenweiz/scCAEs
 SCCAF	NA	NA	SCCAF	SCCAF/sccaf
 scCAN	NA	scCAN	NA	cran/scCAN
 scCancer	NA	NA	NA	wguo-research/scCancer
@@ -668,12 +689,14 @@ SCDE	scde	NA	NA	hms-dbmi/scde
 scDEAL	NA	NA	NA	OSU-BMBL/scDEAL
 scDECAF	NA	NA	NA	DavisLaboratory/scDECAF
 scDeepCluster	NA	NA	NA	ttgump/scDeepCluster
+scDeepSort	NA	NA	NA	ZJUFanLab/scDeepSort
 scDesign	NA	NA	NA	Vivianstats/scDesign
 scDesign2	NA	NA	NA	JSB-UCLA/scDesign2
 scDetect	NA	NA	NA	IVDgenomicslab/scDetect
 scDGN	NA	NA	NA	SongweiGe/scDGN
 scDHA	NA	scDHA	NA	duct317/scDHA
 scdiff	NA	NA	scdiff	phoenixding/scdiff
+scDiffCom	NA	scDiffCom	NA	CyrilLagger/scDiffCom
 scdNet	NA	NA	NA	ChenLabGCCRI/scdNet
 scdney	NA	NA	NA	sydneybiox/scdney
 scDoc	NA	NA	NA	anlingUA/scDoc
@@ -692,6 +715,7 @@ scFBA	NA	NA	NA	BIMIB-DISCo/scFBA
 scFEA	NA	NA	NA	changwn/scFEA
 scFeatureFilter	scFeatureFilter	NA	NA	gdevailly/scFeatureFilter
 scfind	NA	NA	NA	hemberg-lab/scfind
+scFlow	NA	NA	NA	combiz/scflow
 scFusion	NA	NA	NA	XiDsLab/scFusion
 scGAE	NA	NA	NA	ZixiangLuo1161/scGAE
 scGAN	NA	NA	NA	imsb-uke/scGAN
@@ -711,6 +735,7 @@ SCHNAPPs	NA	NA	NA	C3BI-pasteur-fr/UTechSCB-SCHNAPPs
 SCHNEL	NA	NA	NA	paulderaadt/HSNE-clustering
 scHOT	scHOT	NA	NA	shazanfar/scHOT
 scHPF	NA	NA	NA	simslab/scHPF
+scHPL	NA	NA	scHPL	lcmmichielsen/scHPL
 scIB	NA	NA	NA	theislab/scib
 SciBet	NA	NA	NA	PaulingLiu/scibet
 scicast	NA	NA	scicast	iandriver/SCICAST
@@ -729,8 +754,10 @@ scirpy	NA	NA	scirpy	icbi-lab/scirpy
 scisorseqr	NA	NA	NA	noush-joglekar/scisorseqr
 scISR	NA	NA	NA	duct317/scISR
 scIVA	NA	NA	NA	IMB-Computational-Genomics-Lab/scIVA
+Sciviewer	NA	NA	sciviewer	colabobio/sciviewer
 scLAPA	NA	NA	NA	BMILAB/scLAPA
 scLCA	NA	NA	NA	NA
+scLINE	NA	NA	NA	BMILAB/scLINE
 SClineager	NA	NA	NA	inmybrain/SClineager
 scLink	NA	scLink	NA	Vivianstats/scLink
 scLVM	NA	NA	scLVM	PMBio/scLVM
@@ -780,6 +807,7 @@ scPower	NA	NA	NA	heiniglab/scPower
 scPred	NA	NA	NA	powellgenomicslab/scPred
 scprep	NA	NA	scprep	KrishnaswamyLab/scprep
 scPretrain	NA	NA	NA	ruiyi-zhang/scPretrain
+scProject	NA	NA	scProject	gofflab/scProject
 SCQC	NA	NA	NA	ybai3/scqc
 scQcut	NA	NA	NA	mary77/scQcut
 scQuint	NA	NA	NA	songlab-cal/scquint
@@ -812,6 +840,7 @@ scSeqR	NA	NA	NA	rezakj/scSeqR
 scShaper	NA	NA	NA	elolab/scshaper
 scsim	NA	NA	NA	dylkot/scsim
 scSimClassify	NA	NA	NA	digi2002/scSimClassify
+SCSit	NA	NA	scsit	shang-qian/SCSit
 scsnv	NA	NA	NA	GWW/scsnv
 scSO	NA	NA	NA	QuKunLab/scSO
 scSorter	NA	scSorter	NA	hyguo2/scSorter
@@ -920,6 +949,7 @@ SPARSim	NA	NA	NA	NA
 SPaRTAN	NA	NA	NA	osmanbeyoglulab/SPaRTAN
 Specter	NA	NA	NA	canzarlab/Specter
 Spectrum	NA	Spectrum	NA	crj32/Spectrum
+splattdr	NA	NA	NA	zacharewskilab/splattdr
 Splatter	splatter	NA	NA	Oshlack/splatter
 SPRING	NA	NA	NA	AllonKleinLab/SPRING
 SPsimSeq	SPsimSeq	NA	NA	CenterForStatistics-UGent/SPsimSeq
@@ -944,6 +974,7 @@ talklr	NA	NA	NA	yuliangwang/talklr
 Tangram	NA	NA	tangram-sc	broadinstitute/Tangram
 TAR-scRNA-seq	NA	NA	NA	fw262/TAR-scRNA-seq
 TASC	NA	NA	NA	scrna-seq/TASC
+tascCODA	NA	NA	NA	bio-datascience/tascCODA
 TASIC	NA	NA	NA	NA
 TBSP	NA	NA	tbsp	phoenixding/tbsp
 TCM	NA	NA	NA	gongx030/tcm
@@ -977,6 +1008,7 @@ Tweedieverse	NA	NA	NA	himelmallick/Tweedieverse
 TWO-SIGMA	NA	NA	NA	edvanburen/twosigma
 txburst	NA	NA	NA	sandberg-lab/txburst
 UCell	NA	NA	NA	carmonalab/UCell
+UICPC	NA	NA	NA	NA
 UMI_analysis	NA	NA	NA	ncgr/UMI-analysis
 UMI-tools	NA	NA	umi-tools	CGATOxford/UMI-tools
 UMICollapse	NA	NA	NA	Daniel-Liu-c0deb0t/UMICollapse
