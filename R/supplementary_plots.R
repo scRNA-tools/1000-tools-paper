@@ -554,7 +554,7 @@ plot_publications_correlation <- function(references) {
         ggplot2::labs(
             title = "Publications metrics correlations",
             x     = "log<sub>10</sub>(Citations + 1)",
-            y     = "log<sub>10</sub>(Altmetric attention score + 1)"
+            y     = "log<sub>10</sub>(Altmetric Attention Score + 1)"
         ) +
         ggplot2::guides(
             colour = ggplot2::guide_colourbar(
@@ -628,14 +628,14 @@ plot_tools_correlation <- function(tools) {
                 levels = c("LogTotalCitations", "LogTotalAltmetric"),
                 labels = c(
                     "log<sub>10</sub>(Total citations + 1)",
-                    "log<sub>10</sub>(Total Altmetric attention score + 1)"
+                    "log<sub>10</sub>(Total Altmetric Attention Score + 1)"
                 )
             ),
             YType = factor(
                 YType,
                 levels = c("LogTotalAltmetric", "LogGHStars"),
                 labels = c(
-                    "log<sub>10</sub>(Total Altmetric attention score + 1)",
+                    "log<sub>10</sub>(Total Altmetric Attention Score + 1)",
                     "log<sub>10</sub>(GitHub stars + 1)"
                 )
             )
