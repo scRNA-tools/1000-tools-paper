@@ -101,7 +101,7 @@ include_analytics <- FALSE
 
 #### Analytics access
 
-Data for plots showing usage statistics of the scRNA-tools website are collected using the **{googleAnalyticsR}** website.
+Data for plots showing usage statistics of the scRNA-tools website are collected using the **{googleAnalyticsR}** package.
 For this to work you must set up authentication with the `googleAnalyticsR::ga_auth_setup()` function following the instructions here https://code.markedmondson.me/googleAnalyticsR/articles/setup.html.
 
 At the end of the process your `.Renviron` file should contain lines similar to these:
