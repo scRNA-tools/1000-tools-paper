@@ -767,3 +767,94 @@ plot_tools_correlation <- function(tools) {
 
     return(grob)
 }
+
+#' Plot tools over time
+#'
+#' Plot the number of tools in the database over time with a fit
+#'
+#' @param tools data.frame containing tools data
+#'
+#' @return ggplot object
+plot_tools_over_time_fit <- function(tools) {
+
+    date_totals <- get_date_totals(tools) %>%
+        dplyr::mutate(Day = as.numeric(Date - min(Date))) %>%
+        dplyr::mutate(Day2 = Day * Day)
+
+    fit <- lm(Total ~ Day + Day2, data = date_totals)
+
+    x2_coef_str <- format(
+        fit$coefficients[3],
+        digits     = 1,
+        nsmall     = 1,
+        scientific = FALSE,
+        trim       = FALSE
+    )
+    x_coef_str <- format(
+        fit$coefficients[2],
+        digits     = 1,
+        nsmall     = 1,
+        scientific = FALSE,
+        trim       = FALSE
+    )
+    int_coef_str <- format(
+        fit$coefficients[1],
+        digits     = 1,
+        nsmall     = 1,
+        scientific = FALSE,
+        trim       = FALSE
+    )
+    fit_label <- glue::glue(
+        "y = ",
+        "{x2_coef_str}x<sup>2</sup> + ",
+        "{x_coef_str}x + ",
+        "{int_coef_str}"
+    )
+
+    date_totals <- dplyr::mutate(date_totals, FittedTotal = fit$fitted.values)
+
+    ggplot2::ggplot(
+        date_totals,
+        ggplot2::aes(x = .data$Date, y = .data$Total)
+    ) +
+        annotate_pub_date() +
+        ggplot2::geom_line(
+            ggplot2::aes(y = .data$Total),
+            size   = 2,
+            colour = "#984ea3",
+            alpha  = 0.5
+        ) +
+        ggplot2::geom_function(
+            fun = function(date) {
+                day <- as.numeric(date - min(date_totals$Date))
+                predict(fit, newdata = data.frame(Day = day, Day2 = day * day))
+            },
+            linetype = "longdash",
+            size     = 0.8,
+            colour   = "#984ea3"
+        ) +
+        ggtext::geom_richtext(
+            data = tibble::tibble(
+                Date  = as.Date("2025-01-01"),
+                Total = 1500
+            ),
+            label        = fit_label,
+            family       = "Noto Sans",
+            size         = 4,
+            colour       = "#984ea3",
+            fill         = NA,
+            label.colour = NA,
+        ) +
+        ggplot2::expand_limits(x = as.Date("2026-01-01"), y = 0) +
+        ggplot2::scale_x_date(
+            expand = ggplot2::expansion(mult = c(0, 0.05))
+        ) +
+        ggplot2::scale_y_continuous(
+            expand = ggplot2::expansion(mult = c(0, 0))
+        ) +
+        ggplot2::labs(
+            y = "Number of tools in database"
+        ) +
+        theme_1000(base_size = 16)
+}
+

@@ -527,6 +527,27 @@ list(
         ),
         format = "file"
     ),
+    tar_target(
+        tools_over_time_fit_plot,
+        plot_tools_over_time_fit(tools)
+    ),
+    tar_target(
+        tools_over_time_fit_png,
+        ggplot2::ggsave(
+            plot     = tools_over_time_fit_plot,
+            filename = here(
+                "output", "supplementary", "tools_fit.png"
+            ),
+            device   = ragg::agg_png,
+            width    = 20,
+            height   = 14,
+            units    = "cm",
+            res      = 300,
+            scaling  = 0.8,
+            bg       = "white"
+        ),
+        format = "file"
+    ),
     ##====================================================================##
     ## ---- Other plots ----
     ##====================================================================##
