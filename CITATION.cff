@@ -10,7 +10,7 @@ authors:
 title: "1000 tools paper"
 url: "https://github.com/scRNA-tools/1000-tools-paper"
 preferred-citation:
-  type: unpublished
+  type: article
   authors:
   - family-names: "Zappia"
     given-names: "Luke"
@@ -18,8 +18,8 @@ preferred-citation:
   - family-names: "Theis"
     given-names: "Fabian J"
     orcid: "https://orcid.org/0000-0002-2419-1943"
-  doi: "10.1101/2021.08.13.456196"
-  journal: "bioRxiv"
-  month: 8
+  doi: "10.1186/s13059-021-02519-4"
+  journal: "Genome Biology"
+  month: 10
   title: "Over 1000 tools reveal trends in the single-cell RNA-seq analysis landscape"
   year: 2021

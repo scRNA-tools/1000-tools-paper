@@ -149,21 +149,23 @@ The code is available under the [MIT](https://github.com/scRNA-tools/1000-tools/
 If you use any of the code in this repository or analysis in the publication please cite:
 
 > Zappia L, Theis FJ. _"Over 1000 tools reveal trends in the single-cell RNA-seq
-> analysis landscape"_, **bioRxiv** (2021),
-> DOI: [10.1101/2021.08.13.456196](https://doi.org/10.1101/2021.08.13.456196)
+> analysis landscape"_, **Genome Biology** (2021),
+> DOI: [10.1186/s13059-021-02519-4](https://doi.org/10.1186/s13059-021-02519-4)
 
 ```bibtex
 
-@UNPUBLISHED{,
+@ARTICLE{Zappia2021-bc,
   title    = "Over 1000 tools reveal trends in the single-cell {RNA-seq}
               analysis landscape",
   author   = "Zappia, Luke and Theis, Fabian J",
-  journal  = "bioRxiv",
-  pages    = "2021.08.13.456196",
-  month    =  aug,
+  journal  = "Genome Biol.",
+  volume   =  22,
+  number   =  1,
+  pages    = "301",
+  month    =  oct,
   year     =  2021,
   language = "en",
-  doi      = "10.1101/2021.08.13.456196",
-  url      = "https://doi.org/10.1101/2021.08.13.456196"
+  doi      = "10.1186/s13059-021-02519-4",
+  url      = "https://doi.org/10.1186/s13059-021-02519-4"
 }
 ```
